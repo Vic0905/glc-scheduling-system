@@ -7,28 +7,47 @@
     </x-slot>
 
 <div class="flex flex-wrap md:flex-nowrap justify-center items-center p-5 space-x-4 w-full">
+    @role('admin')
     <!-- Search Input (Centered on Mobile) -->
     <div class="flex flex-col items-center w-full">
         <form action="{{ route('schedules.available') }}" method="GET" class="flex flex-col md:flex-row items-center gap-2 w-full max-w-md">
+         <!-- Teacher Name Input -->
+                <div class="relative w-full text-gray-800 uppercase font-bold">
+                    <input type="text" name="teacher_name" value="{{ request('teacher_name') }}"
+                        placeholder="Search by teacher name"
+                        class="block w-full px-3 py-2 pl-10 text-gray-800 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"/>
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 18a7 7 0 100-14 7 7 0 000 14zM21 21l-4.35-4.35" />
+                        </svg>
+                    </div>
+                </div>
+        </form>
+    </div>
+    @elserole('teacher')
+    <div class="flex flex-col items-center w-full">
+      <form action="{{ route('schedules.available') }}" method="GET"
+            class="flex flex-col md:flex-row items-center gap-2 w-full max-w-md">
+            <!-- 🔍 Search by Student Name -->
             <div class="relative w-full text-gray-800 uppercase font-bold">
-                <input type="text" name="teacher_name" value="{{ request('teacher_name') }}" placeholder="Search by teacher name"
-                    class="block w-full px-4 py-3 pl-10 text-gray-800 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-300 ease-in-out"/>
+                <input type="text" name="student_name" id="student_name"
+                    value="{{ request('student_name') }}"
+                    placeholder="Search by student name"
+                    class="block w-full px-3 py-2 pl-10 text-gray-800 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"/>
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 18a7 7 0 100-14 7 7 0 000 14zM21 21l-4.35-4.35" />
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M11 18a7 7 0 100-14 7 7 0 000 14zM21 21l-4.35-4.35" />
                     </svg>
                 </div>
             </div>
-            <button class="bg-gray-900 hover:bg-transparent px-5 py-2 text-sm shadow-sm hover:shadow-lg font-medium tracking-wider
-                                border-2 border-gray-200 hover:border-gray-200 text-gray-100 hover:text-gray-900 rounded-lg transition ease-in duration-100"
-                type="submit">
-                Generate
-            </button>
         </form>
     </div>
-             
+    @endrole
+   
     <!-- Add Schedule Button (Centered on Mobile) -->
-    <div class="flex justify-center w-full mt-3">
+    <div class="flex justify-center w-full">
         <a href="{{ route('schedules.index') }}" 
         class="bg-gray-900 hover:bg-transparent px-5 py-2 text-sm shadow-sm hover:shadow-lg font-medium tracking-wider
                                 border-2 border-gray-200 hover:border-gray-200 text-gray-100 hover:text-gray-900 rounded-lg transition ease-in duration-100">

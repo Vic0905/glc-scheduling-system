@@ -1,9 +1,9 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-bold text-2xl text-gray-800 leading-tight tracking-tight"> {{-- Adjusted header text size --}}
-            {{ __('Admin Dashboard') }}
+            @role('admin'){{ __('Admin Dashboard') }} @elserole('teacher') {{ __('Teacher Dashboard') }} @else {{ __('Dashboard') }} @endrole
         </h2>
-    </x-slot>
+    </x-slot> 
 
     @role('admin')
         <div class="py-10 bg-gray-50 min-h-screen"> {{-- Slightly reduced vertical padding --}}
@@ -77,13 +77,14 @@
                                 </svg>
                             </div>
                             <h3 class="text-md font-semibold text-gray-700 mb-1">Total Schedules</h3>
-                            <p id="schedulesCount" class="text-4xl font-extrabold text-orange-500 animate-fade-in">0</p>
+                            <p id="schedulesCount" class="text-4xl font-extrabold text-yellow-500 animate-fade-in">0</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     @endrole
+
 
     <style>
         @keyframes fadeIn {
@@ -97,21 +98,10 @@
     </style>
 
    <script>
-    /**
-     * Easing function for smoother animation (easeOutQuad)
-     * @param {number} t - Progress value from 0 to 1
-     * @returns {number}
-     */
     function easeOutQuad(t) {
         return t * (2 - t);
     }
 
-    /**
-     * Animates a numerical count on an HTML element with easing.
-     * @param {string} elementId - The ID of the HTML element to update.
-     * @param {number} targetNumber - The final number to display.
-     * @param {number} [duration=2000] - Total duration of the animation in milliseconds.
-     */
     function animateCount(elementId, targetNumber, duration = 2000) {
         const element = document.getElementById(elementId);
         if (!element) return;
@@ -141,6 +131,7 @@
         animateCount("teachersCount", {{ $teachersCount ?? 0 }});
         animateCount("subjectsCount", {{ $subjectsCount ?? 0 }});
         animateCount("schedulesCount", {{ $schedulesCount ?? 0 }});
+
     });
 </script>
 

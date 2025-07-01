@@ -44,14 +44,14 @@
                                 <td class="px-2 py-4 whitespace-nowrap bg-gray-100">
                                   <!-- Edit Button -->
                                     <a href="{{ route('schedules.edit', $student->id) }}"
-                                    class="group inline-flex items-center text-gray-800 hover:text-blue-600 text-sm cursor-pointer ml-1">
+                                    class="group inline-flex items-center text-blue-500 hover:text-blue-700 text-sm cursor-pointer ml-1">
                                         <!-- Edit Icon (Pencil) -->
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M15.232 5.232l3.536 3.536M9 11l6-6m2 2L9 17H5v-4l10-10z" />
                                         </svg>
-                                        <span class="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Edit</span>
+                                        <span class="ml-1">Edit</span>
                                     </a>
 
                                     <!-- Delete Button -->
@@ -60,7 +60,7 @@
                                         method="POST"
                                         class="inline-block ml-3">
                                         @csrf
-                                        @method('DELETE')
+                                        @method('DELETE') 
                                         <button type="button"
                                                 onclick="confirmDelete({{ $student->id }})"
                                                 class="group inline-flex items-center text-red-500 hover:text-red-700 text-sm cursor-pointer">
@@ -70,7 +70,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22" />
                                             </svg>
-                                            <span class="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">Delete</span>
+                                            <span class="ml-1">Delete</span>
                                         </button>
                                     </form>
                                 </td>

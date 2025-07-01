@@ -1,11 +1,15 @@
 
-
+@php
+    $students = App\Models\Student::all();
+    $subjects = App\Models\Subject::all();
+@endphp
 <div class="py-2">
     <div class="max-w-10xl mx-auto sm:px-4 lg:px-6 ">
         <div class="overflow-x-auto"></div>
         <div class="bg-white shadow-sm sm:rounded-lg p-6">
  
-            <div class="bg-white shadow-xl rounded-2xl overflow-hidden max-w-full max-h-[600px] overflow-y-auto text-sm font-sans">
+            <div class="bg-white shadow-xl rounded-2xl overflow-x-auto overflow-y-auto max-w-full max-h-[700px] text-sm font-sans">
+                <div class="overflow-x-auto"></div>
                 <table class="min-w-full border-separate border-spacing-0 text-sm">
                     <thead class="bg-gray-100 text-gray-900 sticky top-0 z-10 shadow">
                         <tr>
@@ -23,7 +27,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @php
+                        @php 
                             $timeSlots = [
                                 '08:00' => 'time_8_00_8_50',
                                 '09:00' => 'time_9_00_9_50',
@@ -100,12 +104,16 @@
                                             @php
                                                 $scheduledStudents = $group->filter(fn($schedule) => $schedule->{$slotKey});
                                             @endphp
-                                            <td class="px-1 py-2 border align-top">
+                                            <td class="px-1 py-2 border align-top"> 
                                                 @if($scheduledStudents->isNotEmpty())
                                                     @foreach($scheduledStudents as $schedule)
                                                     <div class="schedule-item bg-gray-100 border rounded-md ">
                                                         <div class="text-xs text-gray-600">{{ $schedule->student->name ?? 'N/A' }}</div>
                                                         <div class="text-xs text-gray-600">{{ optional($schedule->subject)->subjectname ?? 'N/A' }}</div>
+                                                        <button onclick="clearSchedule({{ $schedule->id }}, event)" class="text-blue-600 text-xs hover:underline">
+                                                            Clear
+                                                        </button>
+
                                                         <button onclick="deleteSchedule({{ $schedule->id }})" class="text-red-500 text-xs hover:underline">Delete</button>
                                                     </div>
                                                     @endforeach
@@ -142,6 +150,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             </div>
             <div class="flex justify-end text-xs mt-2">
                     {{ $rooms->links() }}
