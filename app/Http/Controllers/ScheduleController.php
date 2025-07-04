@@ -399,12 +399,12 @@ public function clear(Request $request, Schedule $schedule)
 
         // Build the base query for schedules
         $query = Schedule::with(['student', 'teacher.user', 'subject', 'room']) 
-            ->where('schedule_state', '!=', 'cleared') // ✅ Filter out cleared
-            ->whereBetween('schedule_date', [$startDate, $endDate]) // ✅ Date filter
+            ->where('schedule_state', '!=', 'cleared') // Filter out cleared
+            ->whereBetween('schedule_date', [$startDate, $endDate]) // Date filter
             ->orderBy('created_at', 'desc');
         //  ->where('schedule_state', '!=', 'cleared');
 
-        // Filter schedules by teacher name
+        // Filter schedules by teacher name  
         if ($teacherName) {
             $query->whereHas('teacher.user', function ($q) use ($teacherName) {
                 $q->where('name', 'like', '%' . $teacherName . '%');

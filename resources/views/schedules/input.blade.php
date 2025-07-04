@@ -1,30 +1,30 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-gray-800 leading-tight tracking-tight">
+        <h2 class="font-bold text-2xl text-gray-800 dark:text-gray-100 leading-tight tracking-tight">
             {{ __('Input Schedule') }}
         
         </h2>
     </x-slot>
 
-    <div class="flex flex-col md:flex-row md:justify-between items-center p-4 gap-3 w-full max-w-6xl mx-auto">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-end items-stretch p-4 gap-3 w-full max-w-6xl mx-auto">
 
     @php
         $startDate = request('start_date') ?? now()->format('Y-m-d');
         $endDate = request('end_date') ?? now()->format('Y-m-d');
     @endphp
 
-    <form action="{{ route('schedules.input') }}" method="GET" class="flex flex-wrap md:flex-nowrap items-center gap-3 w-full md:w-auto">
+    <form action="{{ route('schedules.input') }}" method="GET" class="flex flex-wrap md:flex-nowrap items-end gap-3 w-full md:w-auto">
         
         {{-- Teacher Search --}}
         <div class="flex flex-col text-sm w-full sm:w-48">
-            <label for="teacher_name" class="text-gray-700 font-semibold mb-1">Teacher</label>
+            <label for="teacher_name" class="text-gray-700 dark:text-gray-200 font-semibold mb-1">Teacher</label>
             <div class="relative">
                 <input type="text" name="teacher_name" id="teacher_name" value="{{ request('teacher_name') }}"
                     placeholder="Search teacher"
-                    class="w-full px-3 py-2 pl-9 text-sm text-gray-800 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    class="w-full px-3 py-2 pl-9 text-sm text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
                 <div class="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 18a7 7 0 100-14 7 7 0 000 14zM21 21l-4.35-4.35" />
                     </svg>
                 </div>
@@ -33,41 +33,40 @@
 
         {{-- Start Date --}}
         <div class="flex flex-col text-sm">
-            <label for="start_date" class="text-gray-700 font-semibold mb-1">Start Date</label>
+            <label for="start_date" class="text-gray-700 dark:text-gray-200 font-semibold mb-1">Start Date</label>
             <input type="date" id="start_date" name="start_date" value="{{ $startDate }}"
-                class="px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
+                class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
 
         {{-- End Date --}}
         <div class="flex flex-col text-sm">
-            <label for="end_date" class="text-gray-700 font-semibold mb-1">End Date</label>
+            <label for="end_date" class="text-gray-700 dark:text-gray-200 font-semibold mb-1">End Date</label>
             <input type="date" id="end_date" name="end_date" value="{{ $endDate }}"
-                class="px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" />
+                class="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:ring-indigo-500 focus:border-indigo-500" />
         </div>
 
         {{-- Submit Button --}}
         <div class="flex flex-col justify-end">
             <label class="invisible">Filter</label>
             <button type="submit"
-                class="bg-gray-900 hover:bg-transparent px-4 py-2 text-xs shadow-sm hover:shadow-lg font-medium tracking-wider
-            border-2 border-gray-200 hover:border-gray-200 text-gray-100 hover:text-gray-900 rounded-lg transition ease-in duration-100">
+                class="bg-gray-700 hover:bg-transparent px-5 py-2 text-sm shadow-sm hover:shadow-lg font-medium tracking-wider
+                  border-2 border-gray-200 dark:border-gray-600 hover:border-gray-200 dark:hover:border-gray-400 text-gray-100 hover:text-gray-900 dark:text-white dark:hover:text-gray-200 rounded-lg transition ease-in duration-100">
                 Filter
             </button>
         </div>
     </form>
 
     {{-- Back Button --}}
-    <div class="mt-3 md:mt-0">
+    <div class="flex flex-col justify-end">
         <a href="{{ route('schedules.index') }}"
-            class="bg-gray-900 hover:bg-transparent px-4 py-2 text-xs shadow-sm hover:shadow-lg font-medium tracking-wider
-            border-2 border-gray-200 hover:border-gray-200 text-gray-100 hover:text-gray-900 rounded-lg transition ease-in duration-100">
+            class="bg-gray-700 hover:bg-transparent px-5 py-2 text-sm shadow-sm hover:shadow-lg font-medium tracking-wider
+                  border-2 border-gray-200 dark:border-gray-600 hover:border-gray-200 dark:hover:border-gray-400 text-gray-100 hover:text-gray-900 dark:text-white dark:hover:text-gray-200 rounded-lg transition ease-in duration-100">
             Back to Schedules
         </a>
     </div>
 </div>
 
 @include('schedules.partials.schedule_input')
-
 
 <script>
     function initializeScheduleFormEvents() {
@@ -172,7 +171,7 @@
                 const button = event.target;
                 const cell = button.closest('td');
 
-                // Replace the <td> content with the form layout
+                // Replace the <td> content with the form layout 
                 cell.innerHTML = `
                     <form class="schedule-form" data-room-id="${data.room_id}" data-time-slot="${data.time_slot}" data-slot-key="${data.slot_key}">
                         <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
@@ -253,6 +252,4 @@
         }
     }
 </script>
-
-
 </x-app-layout>

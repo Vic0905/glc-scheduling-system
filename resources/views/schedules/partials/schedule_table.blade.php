@@ -92,92 +92,96 @@
     updateTime();
 </script> --}}
 
-    <div class="py-2">
-        <div class="max-w-10xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-sm sm:rounded-lg p-6">
-                <div class="bg-white shadow-xl rounded-2xl overflow-hidden max-w-full max-h-[600px] overflow-y-auto text-sm font-sans">
-                    <table class="min-w-full border-separate border-spacing-0 text-sm">
-                        <thead class="text-gray-900 sticky top-0 z-10 shadow">
-                            <tr>
-                                <th class="bg-gray-100 px-3 py-1 border border-gray-200 text-left text-sm">Teacher</th>
-                                <th class="bg-gray-100 px-3 py-1 border border-gray-200 text-left text-sm">Room</th>
-                                <th class="bg-gray-100 px-2 py-1 border border-gray-200 text-center text-sm">Schedule Date</th>
-                                @foreach(['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'] as $time)
+<div class="py-2">
+    <div class="max-w-10xl mx-auto sm:px-6 lg:px-8">
+        <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-900 shadow-xl rounded-2xl overflow-hidden max-w-full max-h-[700px] overflow-y-auto text-sm font-sans">
+                <table class="min-w-full border-separate border-spacing-0 text-sm">
+                    <thead class="text-gray-900 dark:text-white sticky top-0 z-10 shadow">
+                        <tr>
+                            <th class="bg-gray-100 dark:bg-gray-700 px-3 py-1 border border-gray-200 dark:border-gray-600 text-left text-sm">Teacher</th>
+                            <th class="bg-gray-100 dark:bg-gray-700 px-3 py-1 border border-gray-200 dark:border-gray-600 text-left text-sm">Room</th>
+                            <th class="bg-gray-100 dark:bg-gray-700 px-2 py-1 border border-gray-200 dark:border-gray-600 text-center text-sm">Schedule Date</th>
+                            @foreach(['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'] as $time)
+                                @php
+                                    $startTime = \Carbon\Carbon::createFromFormat('H:i', $time);
+                                    $endTime = $startTime->copy()->addMinutes(50);
+                                @endphp
+                                <th class="bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-1 border border-gray-200 dark:border-gray-600 text-center whitespace-nowrap text-sm">
+                                    {{ $startTime->format('H:i') }}<br>to<br>{{ $endTime->format('H:i') }}
+                                </th>
+                            @endforeach
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @php
+                            $timeSlots = [
+                                '08:00' => 'time_8_00_8_50',
+                                '09:00' => 'time_9_00_9_50',
+                                '10:00' => 'time_10_00_10_50',
+                                '11:00' => 'time_11_00_11_50',
+                                '12:00' => 'time_12_00_12_50',
+                                '13:00' => 'time_13_00_13_50',
+                                '14:00' => 'time_14_00_14_50',
+                                '15:00' => 'time_15_00_15_50',
+                                '16:00' => 'time_16_00_16_50',
+                                '17:00' => 'time_17_00_17_50',
+                            ];
+                        @endphp
+
+                        @foreach($groupedSchedules as $group)
+                            <tr class="hover:bg-slate-50 dark:hover:bg-gray-700 align-top transition text-xs">
+                                <td class="px-4 py-3 border border-gray-200 dark:border-gray-700 font-medium text-gray-800 dark:text-white">
+                                    <a href="#" onclick="event.preventDefault(); showTeacherStudents({{ $group->first()->teacher->user->id }}, '{{ $group->first()->schedule_date }}')" 
+                                    class="text-blue-600 dark:text-blue-400 hover:underline">
+                                        {{ $group->first()->teacher->name ?? 'N/A' }}
+                                    </a>
+                                </td>
+                                <td class="px-4 py-3 border border-gray-200 dark:border-gray-700 font-bold text-gray-800 dark:text-white">
+                                    {{ $group->first()->room->roomname ?? 'N/A' }}
+                                </td>
+                                <td class="px-4 py-3 border border-gray-200 dark:border-gray-700 font-bold text-gray-800 dark:text-white">
+                                    {{ $group->first()->schedule_date ?? 'N/A' }}
+                                    @if ($group->first()->schedule_date)
+                                        <br>
+                                        <span class="text-red-500">({{ \Carbon\Carbon::parse($group->first()->schedule_date)->format('l') }})</span>
+                                    @endif
+                                </td>
+
+                                @foreach($timeSlots as $time => $slotKey)
                                     @php
-                                        $startTime = \Carbon\Carbon::createFromFormat('H:i', $time);
-                                        $endTime = $startTime->copy()->addMinutes(50);
+                                        $scheduledStudents = $group->filter(fn($s) => $s->{$slotKey});
                                     @endphp
-                                    <th class="bg-gray-100 text-gray-900 px-3 py-1 border border-gray-200 text-center whitespace-nowrap text-sm">
-                                        {{ $startTime->format('H:i') }}<br>to<br>{{ $endTime->format('H:i') }}
-                                    </th>
-                                @endforeach
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @php
-                                $timeSlots = [
-                                    '08:00' => 'time_8_00_8_50',
-                                    '09:00' => 'time_9_00_9_50',
-                                    '10:00' => 'time_10_00_10_50',
-                                    '11:00' => 'time_11_00_11_50',
-                                    '12:00' => 'time_12_00_12_50',
-                                    '13:00' => 'time_13_00_13_50',
-                                    '14:00' => 'time_14_00_14_50',
-                                    '15:00' => 'time_15_00_15_50',
-                                    '16:00' => 'time_16_00_16_50',
-                                    '17:00' => 'time_17_00_17_50',
-                                ];
-                            @endphp
-
-                            @foreach($groupedSchedules as $group)
-                                <tr class="hover:bg-slate-50 align-top transition text-xs">
-                                    <td class="px-4 py-3 border border-gray-200 font-medium">
-                                        <a href="#" onclick="event.preventDefault(); showTeacherStudents({{ $group->first()->teacher->user->id }}, '{{ $group->first()->schedule_date }}')" 
-                                        class="text-blue-600 hover:underline">
-                                            {{ $group->first()->teacher->name ?? 'N/A' }}
-                                        </a>
-                                    </td>
-                                    <td class="px-4 py-3 border border-gray-200 font-bold">{{ $group->first()->room->roomname ?? 'N/A' }}</td>
-                                        <td class="px-4 py-3 border border-gray-200 font-bold">
-                                        {{ $group->first()->schedule_date ?? 'N/A ' }}
-                                        @if ($group->first()->schedule_date)
-                                            <br>
-                                            <span class="text-red-500">({{ \Carbon\Carbon::parse($group->first()->schedule_date)->format('l') }})</span>
+                                    <td class="px-1 py-1 border border-gray-200 dark:border-gray-700 align-top text-gray-800 dark:text-white">
+                                        @if($scheduledStudents->isNotEmpty())
+                                            @foreach($scheduledStudents as $schedule)
+                                                @php
+                                                    $status = $schedule->status ?? 'N/A';
+                                                    $isAbsent = in_array($status, ['N/A', 'absent GRP', 'absent MTM']);
+                                                    $bgColor = $isAbsent ? 'bg-red-100 dark:bg-red-900' : 'bg-green-100 dark:bg-green-900';
+                                                    $textColor = $isAbsent ? 'text-red-700 dark:text-red-300' : 'text-green-700 dark:text-green-300';
+                                                @endphp
+                                                <div class="{{ $bgColor }} rounded-lg mb-1 p-2 shadow-sm">
+                                                    <strong>{{ $schedule->student->name ?? 'N/A' }}</strong><br>
+                                                    <span class="text-xs {{ $textColor }}">({{ $status }})</span>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <span class="text-gray-400 dark:text-gray-500 text-xs italic">---</span>
                                         @endif
                                     </td>
-                                    @foreach($timeSlots as $time => $slotKey)
-                                        @php
-                                            $scheduledStudents = $group->filter(fn($s) => $s->{$slotKey});
-                                        @endphp
-                                        <td class="px-1 py-1 border border-gray-200 align-top">
-                                            @if($scheduledStudents->isNotEmpty())
-                                                @foreach($scheduledStudents as $schedule)
-                                                    @php
-                                                        $status = $schedule->status ?? 'N/A';
-                                                        $isAbsent = in_array($status, ['N/A', 'absent GRP', 'absent MTM']);
-                                                        $bgColor = $isAbsent ? 'bg-red-100' : 'bg-green-100';
-                                                        $textColor = $isAbsent ? 'text-red-700' : 'text-green-700';
-                                                    @endphp
-                                                    <div class="{{ $bgColor }} rounded-lg mb-1 p-2 shadow-sm">
-                                                        <strong>{{ $schedule->student->name ?? 'N/A' }}</strong><br>
-                                                        <span class="text-xs {{ $textColor }}">({{ $status }})</span>
-                                                    </div>
-                                                @endforeach
-                                            @else
-                                                <span class="text-gray-400 text-xs italic">---</span>
-                                            @endif
-                                        </td>
-                                    @endforeach
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                    <div id="teacherStudentsModalContainer"></div>
-                </div>
-            </div>
-        </div> 
-    </div>
+                                @endforeach
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <div id="teacherStudentsModalContainer"></div>
+            </div> 
+        </div>
+    </div> 
+</div>
+
 
     <script>
         function showTeacherStudents(teacherId, scheduleDate) {
@@ -207,4 +211,4 @@
                 });
             });
         }
-    </script> -
+    </script> 

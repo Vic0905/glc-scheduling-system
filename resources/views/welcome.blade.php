@@ -13,7 +13,7 @@
         <!-- Tailwind CSS (Assuming you're using a CDN) -->
         <script src="https://cdn.tailwindcss.com"></script>
 
-        <style>
+        {{-- <style>
             body {
                 background-image: url('{{ asset('images/glc3.jpg') }}'); /* Add your image path here */
                 background-size: cover;
@@ -21,39 +21,49 @@
                 background-attachment: fixed;
                 background-repeat: no-repeat;
             }
-        </style>
+        </style> --}}
     </head>
-    <body class="font-sans text-white">
+    <body class="font-sans text-white bg-cover bg-center bg-fixed bg-no-repeat" style="background-image: url('{{ asset('images/glc2.jpg') }}');">
 
-        <div class="min-h-screen flex items-center justify-center">
-            <div class="bg-gray-200 bg-opacity-50 text-black p-8 rounded-xl shadow-2xl w-full sm:w-96 overflow-hidden">
-                <div class="text-center mb-6">
-                    <h1 class="text-3xl font-bold text-gray-800">GLC ATTENDANCE</h1>
-                    <p class="mt-2 text-gray-600">Login to view your schedule and manage student attendance.</p>
-                </div>
-        
-                <!-- Navbar -->
-                @if (Route::has('login'))
-                    <nav class="flex justify-center gap-6">
-                        @auth
-                            <a href="{{ url('/dashboard') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md transition-all duration-300">
-                                Dashboard
-                            </a>
-                        @else
-                            <a href="{{ route('login') }}" class="bg-gray-900 hover:bg-transparent px-5 py-2 text-sm shadow-sm hover:shadow-lg font-medium tracking-wider border-2 border-gray-900 hover:border-gray-900 text-white hover:text-gray-900 rounded-lg transition ease-in duration-300">
-                                Log in
-                            </a>
-                            
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="bg-gray-900 hover:bg-transparent px-5 py-2 text-sm shadow-sm hover:shadow-lg font-medium tracking-wider border-2 border-gray-900 hover:border-gray-900 text-white hover:text-gray-900 rounded-lg transition ease-in duration-300">
-                                    Register
-                                </a>
-                            @endif
-                        @endauth
-                    </nav>
-                @endif
+    <!-- Overlay with dark tint -->
+    <div class="absolute inset-0 bg-black bg-opacity-60 z-0"></div>
+
+    <!-- Centered content -->
+    <div class="relative z-10 min-h-screen flex items-center justify-center px-4">
+        <div class="bg-white bg-opacity-20 backdrop-blur-md text-black p-8 rounded-2xl shadow-2xl w-full sm:w-96">
+
+            <!-- Title and subtitle -->
+            <div class="text-center mb-6">
+                <h1 class="text-3xl font-extrabold text-white tracking-wide drop-shadow-md">GLC ATTENDANCE</h1>
+                <p class="mt-2 text-gray-200 text-sm">Login to view your schedule and manage student attendance.</p>
             </div>
+
+            <!-- Navbar Buttons -->
+            @if (Route::has('login'))
+                <nav class="flex flex-col gap-4">
+                    @auth
+                        <a href="{{ url('/dashboard') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium text-center transition duration-300 shadow-md">
+                            Go to Dashboard
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="bg-gray-900 hover:bg-transparent hover:text-gray-900 text-white px-5 py-2 border border-gray-900 rounded-lg font-medium text-center transition duration-300 shadow-sm hover:shadow-lg">
+                            Log in
+                        </a>
+
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}" class="bg-gray-900 hover:bg-transparent hover:text-gray-900 text-white px-5 py-2 border border-gray-900 rounded-lg font-medium text-center transition duration-300 shadow-sm hover:shadow-lg">
+                                Register
+                            </a>
+                        @endif
+                    @endauth
+                </nav>
+            @endif
+
         </div>
+    </div>
+
+</body>
+
         
     </body>
 </html>

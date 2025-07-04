@@ -1,6 +1,7 @@
+
 <!-- Teacher's Students Modal -->
 <div id="teacherStudentsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden z-50">
-    <div class="bg-white rounded-lg shadow-lg p-4 sm:p-5 md:p-6 w-full sm:w-[600px] md:w-[900px] lg:w-[1100px] max-w-[1200px] max-h-[75vh] overflow-y-auto">
+    <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 sm:p-5 md:p-6 w-full sm:w-[600px] md:w-[900px] lg:w-[1100px] max-w-[1200px] max-h-[75vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-bold">{{ $teacher->name }}'s Students</h2>
             <button onclick="closeTeacherStudentsModal()" class="text-gray-500 hover:text-gray-700">
@@ -10,38 +11,38 @@
             </button>
         </div>
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 rounded-lg">
-                <thead class="bg-gray-200 rounded-md">
+            <table class="min-w-full divide-y dark:bg-gray-900 divide-gray-200 rounded-lg">
+                <thead class="bg-gray-200 dark:bg-gray-900 rounded-md">
                     <tr>
-                        <th class="px-2 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Student Name</th>
-                        <th class="px-2 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Subject</th>
-                        <th class="px-2 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Schedule Date</th>
-                        <th class="px-2 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Schedule Time</th>
-                        <th class="px-2 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Status</th>
+                        <th class="dark:text-gray-100 px-2 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Student Name</th>
+                        <th class="dark:text-gray-100 px-2 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Subject</th>
+                        <th class="dark:text-gray-100 px-2 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Schedule Date</th>
+                        <th class="dark:text-gray-100 px-2 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Schedule Time</th>
+                        <th class="dark:text-gray-100 px-2 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Status</th>
                         
                         @role('admin')
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-800 uppercase tracking-wider">Action</th> 
+                        <th class="px-6 py-3 text-left text-xs font-medium dark:text-gray-100 text-gray-800 uppercase tracking-wider">Action</th> 
                         @endrole
                         @role('teacher')
-                        <th class="px-8 py-3 ml-8 text-xs font-medium text-gray-800 uppercase tracking-wider">Action</th>
+                        <th class="px-8 py-3 ml-8 text-xs font-medium dark:text-gray-100 text-gray-800 uppercase tracking-wider">Action</th>
                         @endrole
 
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-300 px-6 py-4">
+                <tbody class="dark:bg-gray-700 bg-white divide-y divide-gray-300 px-6 py-4">
                     @forelse ($students as $student)
                         <tr>
-                                <td class="px-2 py-4 text-xs  whitespace-nowrap bg-gray-100">{{ optional($student->student)->name ?? 'N/A' }}</td>
-                                <td class="px-2 py-4 text-xs  whitespace-nowrap bg-gray-100">{{ optional($student->subject)->subjectname ?? 'N/A' }}</td>
-                                <td class="px-2 py-4 text-xs whitespace-nowrap bg-gray-100">{{ $student->schedule_date ?? 'N/A' }}</td>
-                                <td class="px-2 py-4 text-xs  font-bold whitespace-nowrap bg-gray-100">{{ $student->schedule_time ?? 'N/A' }}</td>
-                                <td class="px-2 py-4 text-xs  whitespace-nowrap bg-gray-100">
+                                <td class="dark:text-gray-100 dark:bg-gray-900 px-2 py-4 text-xs  whitespace-nowrap bg-gray-100">{{ optional($student->student)->name ?? 'N/A' }}</td>
+                                <td class="dark:text-gray-100 dark:bg-gray-900 px-2 py-4 text-xs  whitespace-nowrap bg-gray-100">{{ optional($student->subject)->subjectname ?? 'N/A' }}</td>
+                                <td class="dark:text-gray-100 dark:bg-gray-900 px-2 py-4 text-xs  whitespace-nowrap bg-gray-100">{{ $student->schedule_date ?? 'N/A' }}</td>
+                                <td class="dark:text-gray-100 dark:bg-gray-900 px-2 py-4 text-xs  font-bold whitespace-nowrap bg-gray-100">{{ $student->schedule_time ?? 'N/A' }}</td>
+                                <td class="dark:text-gray-100 dark:bg-gray-900 px-2 py-4 text-xs  whitespace-nowrap bg-gray-100">
                                     <span class="px-2 inline-flex text-s leading-5 font-semibold rounded-full {{ Str::contains($student->status, 'present') ? 'bg-green-100 text-green-900' : 'bg-red-100 text-red-900' }}">
                                         {{ $student->status ?? 'N/A' }}
                                     </span>
                                 </td>
                                 @role('admin')
-                                <td class="px-2 py-4 whitespace-nowrap bg-gray-100">
+                                <td class="px-2 py-4 whitespace-nowrap dark:text-gray-100 dark:bg-gray-900 bg-gray-100">
                                   <!-- Edit Button -->
                                     <a href="{{ route('schedules.edit', $student->id) }}"
                                     class="group inline-flex items-center text-blue-500 hover:text-blue-700 text-sm cursor-pointer ml-1">
@@ -112,5 +113,6 @@
         </div>
     </div>
 </div>
+
 
 
