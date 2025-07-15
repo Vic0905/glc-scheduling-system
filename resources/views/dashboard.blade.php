@@ -78,6 +78,22 @@
         </div>
     @endrole
 
+    @role('teacher')
+        <div class="py-10 bg-gray-50 dark:bg-gray-900 min-h-50-screen">
+            <div class="max-w-6xl mx-auto px-4 sm:px-5 lg:px-6">
+                <div class="text-center text-gray-800 dark:text-gray-200">
+                    <h2 class="text-2xl font-bold mb-4">
+                        Welcome <span class="text-red-600">{{ Auth::user()->name }}</span> to Your Dashboard
+                    </h2>
+                    <p class="text-lg mb-6">
+                        Here you can view your schedules and manage your classes efficiently.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    @endrole
+
 
 
     <style>

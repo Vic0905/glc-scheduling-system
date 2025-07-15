@@ -14,7 +14,7 @@
                 type="email"
                 name="email"
                 :value="old('email')"
-                required
+                required 
                 autofocus
                 autocomplete="username"
             />

@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-sm sm:rounded-lg p-6">
+            <div class="dark:bg-gray-800 bg-white shadow-sm sm:rounded-lg p-6">
                 <!-- Success Message -->
                 @if(session('success'))
                     <div id="successMessage" class="bg-green-600 text-white p-4 mb-6 rounded-lg shadow-md">
@@ -44,11 +44,11 @@
 
                     <!-- Student Selection -->
                     <div class="mb-6">
-                        <label for="student_id" class="block text-lg font-medium text-gray-700 mb-2">Student</label>
+                        <label for="student_id" class="block text-lg font-medium dark:text-gray-100 text-gray-700 mb-2">Student</label>
                         <select 
                             name="student_id" 
                             id="student_id" 
-                            class="block w-full text-md py-3 px-4 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                            class="block w-full text-md py-3 px-4 rounded-lg border dark:bg-gray-900 dark:border-gray-700 border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                             required>
                             @foreach($students->sortBy('name') as $student)
                                 <option value="{{ $student->id }}" {{ old('student_id', $schedule->student_id) == $student->id ? 'selected' : '' }}>
@@ -60,11 +60,11 @@
 
                     <!-- Student Room Selection -->
                     <div class="mb-6">
-                        <label for="student_room_id" class="block text-lg font-medium text-gray-700 mb-2">Student Room</label>
+                        <label for="student_room_id" class="block text-lg font-medium dark:text-gray-100 text-gray-700 mb-2">Student Room</label>
                         <select 
                             name="student_room_id" 
                             id="student_room_id" 
-                            class="block w-full text-md py-3 px-4 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                            class="block w-full text-md py-3 px-4 rounded-lg border dark:bg-gray-900 dark:border-gray-700 border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                             required>
                             @foreach($rooms as $room)
                                 <option value="{{ $room->id }}" {{ old('student_room_id', $schedule->student_room_id) == $room->id ? 'selected' : '' }}>
@@ -76,11 +76,11 @@
 
                     <!-- Teacher Selection -->
                     <div class="mb-6">
-                        <label for="teacher_id" class="block text-lg font-medium text-gray-700 mb-2">Teacher</label>
+                        <label for="teacher_id" class="block text-lg font-medium dark:text-gray-100 text-gray-700 mb-2">Teacher</label>
                         <select 
                             name="teacher_id" 
                             id="teacher_id" 
-                            class="block w-full text-md py-3 px-4 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                            class="block w-full text-md py-3 px-4 rounded-lg border dark:bg-gray-900 dark:border-gray-700 border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                             required>
                             @foreach($teachers->sortBy('name') as $teacher)
                                 <option value="{{ $teacher->user_id }}" {{ old('teacher_id', $schedule->teacher_id) == $teacher->user_id ? 'selected' : '' }}>
@@ -92,11 +92,11 @@
 
                     <!-- Subject Selection -->
                     <div class="mb-6">
-                        <label for="subject_id" class="block text-lg font-medium text-gray-700 mb-2">Subject</label>
+                        <label for="subject_id" class="block text-lg font-medium dark:text-gray-100 text-gray-700 mb-2">Subject</label>
                         <select 
                             name="subject_id" 
                             id="subject_id" 
-                            class="block w-full text-md py-3 px-4 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                            class="block w-full text-md py-3 px-4 rounded-lg border dark:bg-gray-900 dark:border-gray-700 border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                             required>
                             @foreach($subjects->sortBy('subjectname') as $subject)
                                 <option value="{{ $subject->id }}" {{ old('subject_id', $schedule->subject_id) == $subject->id ? 'selected' : '' }}>
@@ -108,11 +108,11 @@
 
                     <!-- Teacher Room Selection -->
                     <div class="mb-6">
-                        <label for="room_id" class="block text-lg font-medium text-gray-700 mb-2">Teacher Room</label>
+                        <label for="room_id" class="block text-lg font-medium dark:text-gray-100 text-gray-700 mb-2">Teacher Room</label>
                         <select 
                             name="room_id" 
                             id="room_id" 
-                            class="block w-full text-md py-3 px-4 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                            class="block w-full text-md py-3 px-4 rounded-lg border dark:bg-gray-900 dark:border-gray-700 border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                             required>
                             @foreach($rooms as $room)
                                 <option value="{{ $room->id }}" {{ old('room_id', $schedule->room_id) == $room->id ? 'selected' : '' }}>
@@ -124,11 +124,11 @@
 
                     <!-- Status -->
                     <div class="mb-6">
-                        <label for="status" class="block text-lg font-medium text-gray-700 mb-2">Status</label>
+                        <label for="status" class="block text-lg font-medium dark:text-gray-100 text-gray-700 mb-2">Status</label>
                         <select 
                             name="status" 
                             id="status" 
-                            class="block w-full text-md py-3 px-4 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                            class="block w-full text-md py-3 px-4 rounded-lg border dark:bg-gray-900 dark:border-gray-700 border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                             required>
                             @foreach(['N/A', 'present MTM', 'present GRP', 'absent MTM', 'absent GRP'] as $status)
                                 <option value="{{ $status }}" {{ old('status', $schedule->status) == $status ? 'selected' : '' }}>

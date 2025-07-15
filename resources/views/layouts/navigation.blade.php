@@ -200,14 +200,14 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')" 
-                            class="text-gray-700 dark:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors duration-150">
+                            class="dark:bg-gray-900 text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors duration-150">
                             Profile
                         </x-dropdown-link>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')" 
                                 onclick="event.preventDefault(); this.closest('form').submit();" 
-                                class="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900 hover:text-red-800 dark:hover:text-red-200 transition-colors duration-150">
+                                class="dark:bg-gray-900 text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900 hover:text-red-800 dark:hover:text-red-200 transition-colors duration-150">
                                 Log Out
                             </x-dropdown-link>
                         </form>

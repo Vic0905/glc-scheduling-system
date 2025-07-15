@@ -2,13 +2,11 @@
     <x-slot name="header">
           <h2 class="font-bold text-2xl text-gray-800 dark:text-gray-100 leading-tight tracking-tight">
             {{ __('Rooms') }}
-            <span class="text-sm text-gray-900">: {{$roomCount}} </span>
         </h2>
     </x-slot>
 
-    <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg p-6">
+            <div class="bg-white dark:bg-gray-900 shadow-sm sm:rounded-lg p-6">
                 <div class="flex flex-wrap md:flex-nowrap justify-center items-center p-5 space-x-4 w-full">
                     <form action="{{ route('rooms.index') }}" method="GET" class="flex flex-col md:flex-row items-center gap-2 w-full max-w-sm">
                         <!-- Search Input -->
@@ -17,8 +15,8 @@
                                 type="text"
                                 name="room_name"
                                 value="{{ request('room_name') }}"
-                                placeholder="Search by room name"
-                                class="block w-full px-3 py-2 pl-10 text-gray-800 dark:text-white dark:bg-gray-700 bg-white border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+                                placeholder="Search by Room name"
+                                class="block w-full px-3 py-2 pl-10 text-gray-800 dark:text-white dark:bg-gray-900 bg-white border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
                             />
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500 dark:text-gray-300" fill="none"
@@ -31,8 +29,8 @@
 
                         <!-- Submit Button -->
                         <button
-                            class="bg-gray-700 hover:bg-transparent px-5 py-2 text-sm shadow-sm hover:shadow-lg font-medium tracking-wider
-                  border-2 border-gray-200 dark:border-gray-600 hover:border-gray-200 dark:hover:border-gray-400 text-gray-100 hover:text-gray-900 dark:text-white dark:hover:text-gray-200 rounded-lg transition ease-in duration-100"
+                            class="bg-gray-800 hover:bg-transparent px-5 py-2 text-sm shadow-sm hover:shadow-lg font-medium tracking-wider
+                            border-2 border-gray-200 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-400 text-gray-100 hover:text-gray-900 dark:text-white dark:hover:text-gray-200 rounded-lg transition ease-in duration-100"
                             type="submit">
                             Search
                         </button>
@@ -41,26 +39,25 @@
                     @role('admin')
                     <div class="flex-justify-left">
                         <button onclick="openCreateModal()" 
-                            class="bg-gray-700 hover:bg-transparent px-5 py-2 text-sm shadow-sm hover:shadow-lg font-medium tracking-wider
-                  border-2 border-gray-200 dark:border-gray-600 hover:border-gray-200 dark:hover:border-gray-400 text-gray-100 hover:text-gray-900 dark:text-white dark:hover:text-gray-200 rounded-lg transition ease-in duration-100">
+                            class="bg-gray-800 hover:bg-transparent px-5 py-2 text-sm shadow-sm hover:shadow-lg font-medium tracking-wider
+                            border-2 border-gray-200 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-400 text-gray-100 hover:text-gray-900 dark:text-white dark:hover:text-gray-200 rounded-lg transition ease-in duration-100">
                             Add Room
                         </button>
                     </div>
                     @endrole
                 </div>
-
                 <!-- Room Table -->
-                <div class="overflow-x-auto overflow-y-auto max-h-96 bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+                <div class="overflow-x-auto overflow-y-auto max-h-96 bg-white dark:bg-gray-900 shadow-lg rounded-lg">
                     <table class="min-w-full table-auto border-collapse border border-gray-300 dark:border-gray-700">
-                        <thead class="sticky top-0 bg-slate-100 dark:bg-gray-700 text-gray-900 dark:text-white z-10">
+                        <thead class="sticky top-0 bg-slate-100 dark:bg-gray-800 text-gray-900 dark:text-white z-10">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Room Name</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
+                        <tbody class="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900">
                             @foreach($rooms as $room)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition duration-150 ease-in-out">
+                            <tr>
                                 <td class="px-6 py-4 text-sm text-gray-800 dark:text-white">{{ $room->roomname }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800 dark:text-white">
                                     <div class="flex justify-start gap-2">
@@ -101,7 +98,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
 @include('rooms.partials.edit-room-modal')
 @include('rooms.partials.create-room-modal')

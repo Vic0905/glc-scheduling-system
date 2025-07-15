@@ -4,7 +4,7 @@
     <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 sm:p-5 md:p-6 w-full sm:w-[600px] md:w-[900px] lg:w-[1100px] max-w-[1200px] max-h-[75vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-bold">{{ $teacher->name }}'s Students</h2>
-            <button onclick="closeTeacherStudentsModal()" class="text-gray-500 hover:text-gray-700">
+            <button onclick="closeTeacherStudentsModal()" class="text-gray-500 dark:text-red-900 hover:text-gray-700 dark:hover:text-red-300">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -37,7 +37,7 @@
                                 <td class="dark:text-gray-100 dark:bg-gray-900 px-2 py-4 text-xs  whitespace-nowrap bg-gray-100">{{ $student->schedule_date ?? 'N/A' }}</td>
                                 <td class="dark:text-gray-100 dark:bg-gray-900 px-2 py-4 text-xs  font-bold whitespace-nowrap bg-gray-100">{{ $student->schedule_time ?? 'N/A' }}</td>
                                 <td class="dark:text-gray-100 dark:bg-gray-900 px-2 py-4 text-xs  whitespace-nowrap bg-gray-100">
-                                    <span class="px-2 inline-flex text-s leading-5 font-semibold rounded-full {{ Str::contains($student->status, 'present') ? 'bg-green-100 text-green-900' : 'bg-red-100 text-red-900' }}">
+                                    <span class="px-2 inline-flex text-s leading-5 font-semibold rounded-full {{ Str::contains($student->status, 'present') ? 'bg-green-100 text-green-900 dark:bg-green-900 dark:text-green-100' : 'bg-red-100 text-red-900 dark:bg-red-900 dark:text-red-100' }}">
                                         {{ $student->status ?? 'N/A' }}
                                     </span>
                                 </td>
@@ -78,14 +78,15 @@
                             @endrole
                             
                             @role('teacher')
-                            <td class="px-2 py-4 whitespace-nowrap bg-gray-100 text-center">
+                            <td class="px-2 py-4 whitespace-nowrap bg-gray-100 dark:bg-gray-900 text-center">
                                 <form action="{{ route('schedules.updateStatus', ['id' => $student->id]) }}" method="POST" class="flex flex-col gap-2 items-center">
                                     @csrf
                                     @method('PATCH') 
                             
                                     <!-- Dropdown -->
                                     <select name="status" 
-                                        class="status-select w-full max-w-[150px] rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-500 transition duration-200 ease-in-out"
+                                        class="status-select w-full max-w-[150px] rounded-lg border border-gray-300 dark:bg-gray-900 bg-gray-200 px-3 py-2 text-xs text-gray-900 dark:text-gray-100 
+                                        dark:hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-500 transition duration-200 ease-in-out"
                                         data-student-id="{{ $student->id }}">
                                         <option value="N/A" {{ $student->status === 'N/A' ? 'selected' : '' }}>N/A</option>
                                         <option value="present GRP" {{ $student->status === 'present GRP' ? 'selected' : '' }}>Present (GRP)</option>
@@ -96,7 +97,7 @@
                             
                                     <!-- Button -->
                                     <button type="submit" 
-                                        class="text-gray-500 hover:text-gray-700 text-sm cursor-pointer hover:underline">
+                                        class="text-blue-500 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm cursor-pointer hover:underline">
                                         Update
                                     </button>
                                 </form>

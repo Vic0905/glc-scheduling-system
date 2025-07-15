@@ -13,10 +13,8 @@
 {{-- this is the code to call the schedule table in the partial --}}
 @include('schedules.partials.schedule_table') 
 
-
 {{-- this is the code to show the teacher's modal from the partial directory --}}
 <div id="teacherStudentsModalContainer"></div>
-
 
 {{-- code to call the modal delete from the partial --}}
 @include('schedules.partials.delete_modal')

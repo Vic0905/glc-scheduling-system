@@ -100,7 +100,8 @@ class ScheduleController extends Controller
 
     // Base query with eager loaded relationships
     $query = Schedule::with(['student', 'teacher.user', 'subject', 'room'])
-                     ->orderBy('schedule_date', 'asc')
+                     ->orderBy('room_id', 'asc') // Order by room_id first
+                     ->orderBy('schedule_date', 'desc')
                      ->orderBy('created_at', 'asc');
 
     // Date range filter takes priority if both are present
@@ -178,46 +179,66 @@ public function clear(Request $request, Schedule $schedule)
         return view('schedules.create', compact('students', 'teachers', 'subjects', 'rooms'));
     }
 
-    public function store(Request $request)
-    {
-        // Validate input data 
-        $validatedData = $request->validate([
-            'schedule_date' => 'required|date',
-            'student_id' => 'required|exists:students,id',
-            'teacher_id' => 'required|exists:users,id', // Make sure 'users' table holds teacher IDs
-            'subject_id' => 'required|exists:subjects,id',
-            'room_id' => 'required|exists:rooms,id',
-            'schedule_time' => 'required|in:08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00',
-        ]);
+   public function store(Request $request)
+{
+    // Validate input data 
+    $validatedData = $request->validate([
+        'schedule_date' => 'required|date',
+        'student_id' => 'required|exists:students,id',
+        'teacher_id' => 'required|exists:users,id',
+        'subject_id' => 'required|exists:subjects,id',
+        'room_id' => 'required|exists:rooms,id',
+        'schedule_time' => 'required|in:08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00',
+    ]);
 
-        // Map time slot to column name 
-        $timeSlots = [
-            '08:00' => 'time_8_00_8_50',
-            '09:00' => 'time_9_00_9_50',
-            '10:00' => 'time_10_00_10_50',
-            '11:00' => 'time_11_00_11_50',
-            '12:00' => 'time_12_00_12_50',
-            '13:00' => 'time_13_00_13_50',
-            '14:00' => 'time_14_00_14_50',
-            '15:00' => 'time_15_00_15_50',
-            '16:00' => 'time_16_00_16_50',
-            '17:00' => 'time_17_00_17_50',
-        ];
-        
-        $timeSlotColumn = $timeSlots[$request->schedule_time];
-        $validatedData[$timeSlotColumn] = 1;
+    // Map time slot to column name 
+    $timeSlots = [
+        '08:00' => 'time_8_00_8_50',
+        '09:00' => 'time_9_00_9_50',
+        '10:00' => 'time_10_00_10_50',
+        '11:00' => 'time_11_00_11_50',
+        '12:00' => 'time_12_00_12_50',
+        '13:00' => 'time_13_00_13_50',
+        '14:00' => 'time_14_00_14_50',
+        '15:00' => 'time_15_00_15_50',
+        '16:00' => 'time_16_00_16_50',
+        '17:00' => 'time_17_00_17_50',
+    ];
+    
+    $timeSlotColumn = $timeSlots[$request->schedule_time];
+    $validatedData[$timeSlotColumn] = 1;
 
-        $validatedData['status'] = 'N/A';
-        $validatedData['schedule_state'] = 'active';
- 
-        // Create the schedule
-        $schedule = Schedule::create($validatedData);
+    $validatedData['status'] = 'N/A';
+    $validatedData['schedule_state'] = 'active';
 
+    // 🔒 Check for teacher conflict
+    $teacherConflict = Schedule::where('teacher_id', $request->teacher_id)
+        ->where('schedule_date', $request->schedule_date)
+        ->where($timeSlotColumn, 1)
+        ->exists();
+
+    // 🔒 Check for student conflict
+    $studentConflict = Schedule::where('student_id', $request->student_id)
+        ->where('schedule_date', $request->schedule_date)
+        ->where($timeSlotColumn, 1)
+        ->exists();
+
+    if ($teacherConflict || $studentConflict) {
         return response()->json([
-            'success' => true,
-            'message' => 'Schedule created successfully!'
-        ]);
+            'success' => false,
+            'message' => 'Conflict detected: The teacher or student is already scheduled at this time.'
+        ], 409); // 409 Conflict HTTP status
     }
+
+    // ✅ Create the schedule
+    $schedule = Schedule::create($validatedData);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Schedule created successfully!'
+    ]);
+}
+
 
     //  A delete method for individual schedules
     public function destroy(Schedule $schedule)

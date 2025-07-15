@@ -8,10 +8,8 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request) 
     {
-        
-
         $studentName = $request->query('student_name');
 
          // If a student name is provided, filter students by that name

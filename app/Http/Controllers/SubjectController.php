@@ -9,13 +9,10 @@ use Illuminate\Http\Request;
 class SubjectController extends Controller
 {
     public function index(Request $request)
-    {
+    { 
         // get all subjects from the database using the subject model class 
         $subjectName = $request->query('subject_name');
         
-        // Get the search term from the query string
-        $subjectName = $request->query('subject_name');
-
         // Query the subjects table, using the correct column name 'subjectname'
         $subjects = Subject::query()
             ->when($subjectName, function ($query) use ($subjectName) {
