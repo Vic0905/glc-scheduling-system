@@ -418,7 +418,12 @@ public function clear(Request $request, Schedule $schedule)
     $endDate = $request->query('end_date', now()->format('Y-m-d'));
 
     // ✅ Include subTeacher eager loading
-    $query = Schedule::with(['student', 'teacher.user', 'subTeacher.user', 'subject', 'room'])
+    $query = Schedule::with(['student', 
+                             'teacher.user', 
+                             'subTeacher.user',
+                             'subTeacher.room', 
+                             'subject', 
+                             'room'])
         ->where('schedule_state', '!=', 'cleared')
         ->whereBetween('schedule_date', [$startDate, $endDate])
         ->orderBy('created_at', 'desc');

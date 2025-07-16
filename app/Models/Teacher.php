@@ -33,4 +33,9 @@ class Teacher extends Model
         return $this->hasMany(Schedule::class);
     }
 
+    public function room()
+    {
+        return $this->belongsTo(Room::class, 'room_id');
+    }
+
 }
