@@ -68,6 +68,7 @@
                                             <input type="hidden" name="start_date" value="{{ request('start_date') }}">
                                             <input type="hidden" name="end_date" value="{{ request('end_date') }}">
                                             <input type="hidden" name="teacher_id" value="">
+                                            <input type="hidden" name="sub_teacher_id" value="">
 
                                             <select name="student_id" class="block w-full text-xs py-1 px-2 mb-1 rounded-lg border border-gray-300 dark:border-gray-600 
                                             bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
@@ -77,19 +78,20 @@
                                                 @endforeach
                                             </select>
 
-                                            <select name="subject_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
+                                            <select name="subject_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-600 
+                                            bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
                                                 <option value="">Select Subject</option>
                                                 @foreach($subjects->sortBy('subjectname') as $subject)
                                                     <option value="{{ $subject->id }}">{{ $subject->subjectname }}</option>
                                                 @endforeach
                                             </select>
                                             {{-- TEACHER NAME SHOULD BE POPULATE HERE THEN WHEN VIEW TO THE TEACHER INDEX IS BY ROOM NOT TEACHER --}}
-                                            <select name="teacher_id" class="block w-full text-xs py-1 px-2 mb-1 rounded-lg border border-gray-300 dark:border-gray-600 
+                                            <select name="sub_teacher_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-600 
                                             bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
-                                                <option value="">Select teacher</option>
-                                                 @foreach($teachers->sortBy('name') as $teacher)
-                                            <option value="{{ $teacher->user_id }}">{{ $teacher->name }}</option>
-                                        @endforeach
+                                                <option value="">Select Substitute Teacher (optional)</option>
+                                                @foreach ($teachers as $teacher)
+                                                    <option value="{{ $teacher->id }}">{{ $teacher->user->name }}</option>
+                                                @endforeach
                                             </select>
                                         </form>
                                     </td>
@@ -116,6 +118,12 @@
                                                     <div class="bg-white dark:bg-gray-900 border dark:border-gray-900 rounded-md p-1 mb-1">
                                                         <div class="text-xs text-gray-700 dark:text-gray-200 font-medium">{{ $schedule->student->name ?? 'N/A' }}</div>
                                                         <div class="text-xs text-gray-600 dark:text-gray-300">{{ optional($schedule->subject)->subjectname ?? 'N/A' }}</div>
+                                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                            @if($schedule->subTeacher)
+                                                                Substitute: {{ $schedule->subTeacher->user->name }}
+                                                            @else
+                                                                No Substitute
+                                                            @endif
                                                         <div class="flex space-x-2 mt-1">
                                                             <button onclick="clearSchedule({{ $schedule->id }}, event)" class="text-blue-600 text-xs hover:underline">Clear</button>
                                                             <button onclick="deleteSchedule({{ $schedule->id }})" class="text-red-500 text-xs hover:underline">Delete</button>
@@ -131,25 +139,28 @@
                                                     <input type="hidden" name="{{ $slotKey }}" value="1">
                                                     <input type="hidden" name="schedule_date" value="{{ $group->first()->schedule_date }}">
 
-                                                    <select name="student_id" class="block w-full text-xs py-1 px-2 mb-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
+                                                    <select name="student_id" class="block w-full text-xs py-1 px-2 mb-1 rounded-lg border border-gray-300 dark:border-gray-600 
+                                                    bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
                                                         <option value="">Select Student</option>
                                                         @foreach($students->sortBy('name') as $student)
                                                             <option value="{{ $student->id }}">{{ $student->name }}</option>
                                                         @endforeach
                                                     </select>
 
-                                                    <select name="subject_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
+                                                    <select name="subject_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-600 
+                                                    bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
                                                         <option value="">Select Subject</option>
                                                         @foreach($subjects->sortBy('subjectname') as $subject)
                                                             <option value="{{ $subject->id }}">{{ $subject->subjectname }}</option>
                                                         @endforeach
                                                     </select>
 
-                                                    <select name="teacher_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
-                                                        <option value="">Select Teacher</option>
-                                                        @foreach($teachers->sortBy('name') as $teacher)
-                                            <option value="{{ $teacher->user_id }}">{{ $teacher->name }}</option>
-                                        @endforeach
+                                                    <select name="sub_teacher_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-600 
+                                                    bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
+                                                        <option value="">Substitute Teacher (optional)</option>
+                                                        @foreach ($teachers as $teacher)
+                                                            <option value="{{ $teacher->id }}">{{ $teacher->user->name }}</option>
+                                                        @endforeach
                                                     </select>
                                                 </form>
                                             @endif

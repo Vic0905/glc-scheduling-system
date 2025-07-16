@@ -166,8 +166,6 @@ public function clear(Request $request, Schedule $schedule)
 ]);
 
 }
-
-
     public function create()
     {
         // list of datas and display it in the admin page for the admin to create the schedule 
@@ -186,6 +184,7 @@ public function clear(Request $request, Schedule $schedule)
         'schedule_date' => 'required|date',
         'student_id' => 'required|exists:students,id',
         'teacher_id' => 'required|exists:users,id',
+        'sub_teacher_id' => 'nullable|exists:users,id',
         'subject_id' => 'required|exists:subjects,id',
         'room_id' => 'required|exists:rooms,id',
         'schedule_time' => 'required|in:08:00,09:00,10:00,11:00,12:00,13:00,14:00,15:00,16:00,17:00',
@@ -406,63 +405,69 @@ public function clear(Request $request, Schedule $schedule)
     }
     
       public function input(Request $request)
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        $students = Student::all();
-        $teachers = Teacher::all(); // Keep for dropdowns
-        $subjects = Subject::all(); // Keep for dropdowns
+    $students = Student::all();
+    $teachers = Teacher::all(); // For both teacher and substitute dropdowns
+    $subjects = Subject::all();
 
-        $teacherName = $request->query('teacher_name', '');
-        $studentName = $request->query('student_name', '');
-        $startDate = $request->query('start_date', now()->format('Y-m-d')); // Added from form
-        $endDate = $request->query('end_date', now()->format('Y-m-d'));     // Added from form
+    $teacherName = $request->query('teacher_name', '');
+    $studentName = $request->query('student_name', '');
+    $startDate = $request->query('start_date', now()->format('Y-m-d'));
+    $endDate = $request->query('end_date', now()->format('Y-m-d'));
 
-        // Build the base query for schedules
-        $query = Schedule::with(['student', 'teacher.user', 'subject', 'room']) 
-            ->where('schedule_state', '!=', 'cleared') // Filter out cleared
-            ->whereBetween('schedule_date', [$startDate, $endDate]) // Date filter
-            ->orderBy('created_at', 'desc');
-        //  ->where('schedule_state', '!=', 'cleared');
+    // ✅ Include subTeacher eager loading
+    $query = Schedule::with(['student', 'teacher.user', 'subTeacher.user', 'subject', 'room'])
+        ->where('schedule_state', '!=', 'cleared')
+        ->whereBetween('schedule_date', [$startDate, $endDate])
+        ->orderBy('created_at', 'desc');
 
-        // Filter schedules by teacher name  
-        if ($teacherName) {
-            $query->whereHas('teacher.user', function ($q) use ($teacherName) {
-                $q->where('name', 'like', '%' . $teacherName . '%');
-            });
-        }
-
-        if ($studentName) {
-            $query->whereHas('student', function ($q) use ($studentName) {
-                $q->where('name', 'like', '%' . $studentName . '%');
-            });
-        }
-
-        $schedules = $query->get();
-
-        $teacherIdsInFilteredSchedules = $schedules->pluck('teacher_id')->unique()->filter()->values()->all();
-
-        $roomQuery = Room::orderBy('roomname');
-
-        if ($teacherName && !empty($teacherIdsInFilteredSchedules)) {
-            // If a teacher was searched and schedules were found for them,
-            // filter rooms to only include those present in the filtered schedules
-            $roomIdsInFilteredSchedules = $schedules->pluck('room_id')->unique()->filter()->values()->all();
-            $roomQuery->whereIn('id', $roomIdsInFilteredSchedules);
-        } else if ($teacherName && empty($teacherIdsInFilteredSchedules)) {
-            $roomQuery->whereRaw('1 = 0'); // Ensures no rooms are returned
-        }
-
-        $rooms = $roomQuery->paginate(50); 
-
-
-        // Group schedules by room name for the Blade view
-        $schedulesByRoom = $schedules->groupBy(function ($schedule) {
-            return $schedule->room->roomname ?? 'Unknown Room';
+    if ($teacherName) {
+        $query->whereHas('teacher.user', function ($q) use ($teacherName) {
+            $q->where('name', 'like', '%' . $teacherName . '%');
         });
-
-        return view('schedules.input', compact('schedulesByRoom', 'rooms', 'teacherName', 'studentName', 'students', 'teachers', 'subjects', 'startDate', 'endDate'));
     }
+
+    if ($studentName) {
+        $query->whereHas('student', function ($q) use ($studentName) {
+            $q->where('name', 'like', '%' . $studentName . '%');
+        });
+    }
+
+    $schedules = $query->get();
+
+    $teacherIdsInFilteredSchedules = $schedules->pluck('teacher_id')->unique()->filter()->values()->all();
+
+    $roomQuery = Room::orderBy('roomname');
+
+    if ($teacherName && !empty($teacherIdsInFilteredSchedules)) {
+        $roomIdsInFilteredSchedules = $schedules->pluck('room_id')->unique()->filter()->values()->all();
+        $roomQuery->whereIn('id', $roomIdsInFilteredSchedules);
+    } else if ($teacherName && empty($teacherIdsInFilteredSchedules)) {
+        $roomQuery->whereRaw('1 = 0'); // No rooms shown if no match
+    }
+
+    $rooms = $roomQuery->paginate(50);
+
+    // Group by room for Blade view
+    $schedulesByRoom = $schedules->groupBy(function ($schedule) {
+        return $schedule->room->roomname ?? 'Unknown Room';
+    });
+
+    return view('schedules.input', compact(
+        'schedulesByRoom',
+        'rooms',
+        'teacherName',
+        'studentName',
+        'students',
+        'teachers',
+        'subjects',
+        'startDate',
+        'endDate'
+    ));
+}
+
     
     // delete method to delete the row by room and specific date
     public function destroyByRoomAndDate($roomId, $scheduleDate)

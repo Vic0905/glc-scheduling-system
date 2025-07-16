@@ -62,65 +62,74 @@
 
     <script>
         function initializeScheduleFormEvents() {
-            document.querySelectorAll('.schedule-form select').forEach(select => {
-                if (!select.dataset.bound) { // Prevent rebinding
-                    select.dataset.bound = true;
+    document.querySelectorAll('.schedule-form select').forEach(select => {
+        if (!select.dataset.bound) { // Prevent rebinding
+            select.dataset.bound = true;
 
-                    select.addEventListener('change', function () {
-                        const form = this.closest('form');
-                        const studentSelect = form.querySelector('select[name="student_id"]');
-                        const subjectSelect = form.querySelector('select[name="subject_id"]');
+            select.addEventListener('change', function () {
+                const form = this.closest('form');
+                const studentSelect = form.querySelector('select[name="student_id"]');
+                const subjectSelect = form.querySelector('select[name="subject_id"]');
+                const subTeacherSelect = form.querySelector('select[name="sub_teacher_id"]');
+                const subTeacherIdInput = form.querySelector('input[name="sub_teacher_id"]');
 
-                        const row = this.closest('tr');
-                        const teacherSelect = row?.querySelector('.teacher-select');
-                        const teacherIdInput = form.querySelector('input[name="teacher_id"]');
-                        let teacherId = teacherIdInput?.value || teacherSelect?.value;
+                const row = this.closest('tr');
+                const teacherSelect = row?.querySelector('.teacher-select');
+                const teacherIdInput = form.querySelector('input[name="teacher_id"]');
+                let teacherId = teacherIdInput?.value || teacherSelect?.value;
 
-                        if (studentSelect.value && subjectSelect.value && teacherId) {
-                            const startDateInput = document.querySelector('input[name="start_date"]');
-                            const endDateInput = document.querySelector('input[name="end_date"]');
+                // ✅ Sync sub_teacher_id input if changed
+                if (this.name === 'sub_teacher_id' && subTeacherIdInput) {
+                    subTeacherIdInput.value = this.value;
+                    console.log('Updated sub_teacher_id to:', this.value);
+                }
 
-                            const startDate = new Date(startDateInput?.value ?? '{{ now()->format("Y-m-d") }}');
-                            const endDate = new Date(endDateInput?.value ?? '{{ now()->format("Y-m-d") }}');
+                if (studentSelect.value && subjectSelect.value && teacherId) {
+                    const startDateInput = document.querySelector('input[name="start_date"]');
+                    const endDateInput = document.querySelector('input[name="end_date"]');
 
-                            const dates = [];
-                            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-                                dates.push(new Date(d));
-                            }
+                    const startDate = new Date(startDateInput?.value ?? '{{ now()->format("Y-m-d") }}');
+                    const endDate = new Date(endDateInput?.value ?? '{{ now()->format("Y-m-d") }}');
 
-                            Promise.all(dates.map(date => {
-                                const formData = new FormData(form);
-                                formData.set('teacher_id', teacherId);
-                                formData.set('schedule_date', date.toISOString().slice(0, 10));
+                    const dates = [];
+                    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                        dates.push(new Date(d));
+                    }
 
-                                return fetch("{{ route('schedules.store') }}", {
-                                    method: 'POST',
-                                    headers: {
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                        'Accept': 'application/json',
-                                    },
-                                    body: formData
-                                }).then(response => {
-                                    if (!response.ok) {
-                                        return response.json().then(errorData => {
-                                            throw new Error(errorData.message || 'Server error');
-                                        });
-                                    }
-                                    return response.json();
+                    Promise.all(dates.map(date => {
+                        const formData = new FormData(form);
+                        formData.set('teacher_id', teacherId);
+                        formData.set('schedule_date', date.toISOString().slice(0, 10));
+
+                        return fetch("{{ route('schedules.store') }}", {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json',
+                            },
+                            body: formData
+                        }).then(response => {
+                            if (!response.ok) {
+                                return response.json().then(errorData => {
+                                    throw new Error(errorData.message || 'Server error');
                                 });
-                            }))
-                            .then(() => location.reload())
-                            .catch(error => {
-                                console.error('Error submitting schedules:', error);
-                                alert('An error occurred: ' + error.message);
-                                studentSelect.value = '';
-                                subjectSelect.value = '';
-                            });
-                        }
+                            }
+                            return response.json();
+                        });
+                    }))
+                    .then(() => location.reload())
+                    .catch(error => {
+                        console.error('Error submitting schedules:', error);
+                        alert('An error occurred: ' + error.message);
+                        studentSelect.value = '';
+                        subjectSelect.value = '';
                     });
                 }
             });
         }
+    });
+}
+
 
         document.addEventListener('DOMContentLoaded', function () {
             initializeScheduleFormEvents(); // Initial binding
@@ -179,12 +188,18 @@
                                 ${data.students.map(student => `<option value="${student.id}">${student.name}</option>`).join('')}
                             </select>
 
-                            <select name="subject_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <select name="subject_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-1" required>
                                 <option value="" selected>Select Subject</option>
                                 ${data.subjects.map(subject => `<option value="${subject.id}">${subject.subjectname}</option>`).join('')}
                             </select>
+
+                            <select name="sub_teacher_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-1">
+                                <option value="">Substitute Teacher (optional)</option>
+                                ${data.teachers.map(teacher => `<option value="${teacher.id}">${teacher.user.name}</option>`).join('')}
+                            </select>
                         </form>
                     `;
+
 
                     initializeScheduleFormEvents(); 
                 } else {

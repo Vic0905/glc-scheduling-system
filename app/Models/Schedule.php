@@ -12,6 +12,7 @@ class Schedule extends Model
     protected $fillable = [
     'student_id',
     'teacher_id',
+    'sub_teacher_id', // ✅ Add this line
     'room_id',
     'student_room_id',
     'subject_id',
@@ -53,6 +54,10 @@ class Schedule extends Model
     public function studentRoom()
     {
         return $this->belongsTo(Room::class, 'student_room_id');
+    }
+    public function subTeacher()
+    {
+        return $this->belongsTo(Teacher::class, 'sub_teacher_id', 'user_id');
     }
 }
 
