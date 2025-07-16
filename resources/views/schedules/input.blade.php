@@ -25,7 +25,7 @@
                             </svg>
                         </div>
                     </div>
-                </div>
+                </div>  
 
                 <div class="flex flex-col text-sm">
                     <label for="start_date" class="text-gray-700 dark:text-gray-200 font-semibold mb-1">Start Date</label>
@@ -245,3 +245,4 @@
         }
     </script>
 </x-app-layout>
+ 

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
          <h2 class="font-bold text-2xl text-gray-800 dark:text-gray-100 leading-tight tracking-tight">
-            {{ __('Schedules') }}
+            {{ __('Teacher') }}
             {{-- <span class="text-sm text-gray-500">({{ $schedules->total() }} schedules)</span> --}}
         </h2>
     </x-slot>

@@ -69,7 +69,8 @@
                                             <input type="hidden" name="end_date" value="{{ request('end_date') }}">
                                             <input type="hidden" name="teacher_id" value="">
 
-                                            <select name="student_id" class="block w-full text-xs py-1 px-2 mb-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
+                                            <select name="student_id" class="block w-full text-xs py-1 px-2 mb-1 rounded-lg border border-gray-300 dark:border-gray-600 
+                                            bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
                                                 <option value="">Select Student</option>
                                                 @foreach($students->sortBy('name') as $student)
                                                     <option value="{{ $student->id }}">{{ $student->name }}</option>
@@ -81,6 +82,14 @@
                                                 @foreach($subjects->sortBy('subjectname') as $subject)
                                                     <option value="{{ $subject->id }}">{{ $subject->subjectname }}</option>
                                                 @endforeach
+                                            </select>
+                                            {{-- TEACHER NAME SHOULD BE POPULATE HERE THEN WHEN VIEW TO THE TEACHER INDEX IS BY ROOM NOT TEACHER --}}
+                                            <select name="teacher_id" class="block w-full text-xs py-1 px-2 mb-1 rounded-lg border border-gray-300 dark:border-gray-600 
+                                            bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
+                                                <option value="">Select teacher</option>
+                                                 @foreach($teachers->sortBy('name') as $teacher)
+                                            <option value="{{ $teacher->user_id }}">{{ $teacher->name }}</option>
+                                        @endforeach
                                             </select>
                                         </form>
                                     </td>
@@ -135,6 +144,13 @@
                                                             <option value="{{ $subject->id }}">{{ $subject->subjectname }}</option>
                                                         @endforeach
                                                     </select>
+
+                                                    <select name="teacher_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
+                                                        <option value="">Select Teacher</option>
+                                                        @foreach($teachers->sortBy('name') as $teacher)
+                                            <option value="{{ $teacher->user_id }}">{{ $teacher->name }}</option>
+                                        @endforeach
+                                                    </select>
                                                 </form>
                                             @endif
                                         </td>
@@ -150,7 +166,7 @@
     <div class="flex justify-end text-xs mt-2 dark:text-gray-300">
         {{ $rooms->links() }}
     </div>
-</div>
+</div>  
 
 
 

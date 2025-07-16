@@ -1,4 +1,4 @@
-{{-- <div class="py-2">
+<div class="py-2">
     <div class="max-w-10xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white dark:bg-gray-900 sm:rounded-none p-0 shadow-none border border-gray-300 dark:border-gray-700">
             <div class="overflow-auto max-w-full max-h-[700px] text-sm font-sans border-t border-l border-gray-300 dark:border-gray-700">
@@ -86,9 +86,9 @@
             </div>
         </div>
     </div>
-</div> --}}
+</div>
 
-<div class="py-4">
+{{-- <div class="py-4">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
         @php
@@ -119,8 +119,8 @@
                         $scheduleDate = Carbon::parse($schedule->schedule_date);
 
                         $borderColor = match(true) {
-                            $scheduleDate->isToday() => 'border-green-500 ring-green-300/70',
-                            $scheduleDate->isTomorrow() => 'border-yellow-500 ring-yellow-300/70',
+                            $scheduleDate->isToday() => 'border-green-500 ring-green-500/70',
+                            $scheduleDate->isTomorrow() => 'border-yellow-500 ring-yellow-500/70',
                             default => 'border-red-200 dark:border-red-700 ring-red-500/70',
                         };
                     @endphp
@@ -159,7 +159,7 @@
     </div>
 </div>
 
-<div id="teacherStudentsModalContainer"></div>
+<div id="teacherStudentsModalContainer"></div> --}}
 
 @include('components.alerts.success')
 
