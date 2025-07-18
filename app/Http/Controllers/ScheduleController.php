@@ -99,7 +99,7 @@ class ScheduleController extends Controller
     $endDate = $request->input('end_date');
 
     // Base query with eager loaded relationships
-    $query = Schedule::with(['student', 'teacher.user', 'subject', 'room'])
+    $query = Schedule::with(['student', 'teacher.user', 'subTeacher.room', 'subject', 'room'])
                      ->orderBy('room_id', 'asc') // Order by room_id first
                      ->orderBy('schedule_date', 'desc')
                      ->orderBy('created_at', 'asc');
@@ -157,7 +157,7 @@ public function clear(Request $request, Schedule $schedule)
  return response()->json([
     'success' => true,
     'room_id' => $schedule->room_id,
-    'time_slot' => $schedule->schedule_time,
+    'time_slot' => $schedule->schedule_time, 
     'slot_key' => $request->slot_key, // passed from form or route
     'start_date' => $request->start_date,
     'end_date' => $request->end_date,

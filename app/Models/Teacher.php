@@ -10,7 +10,7 @@ class Teacher extends Model
     use HasFactory;
 
     // Allow mass assignment for these fields
-    protected $fillable = ['name', 'nickname', 'user_id'];
+    protected $fillable = ['name', 'nickname', 'user_id', 'room_id'];
 
     // Define the relationship with the User model
     public function user()
@@ -33,7 +33,7 @@ class Teacher extends Model
         return $this->hasMany(Schedule::class);
     }
 
-    public function room()
+    public function room() 
     {
         return $this->belongsTo(Room::class, 'room_id');
     }

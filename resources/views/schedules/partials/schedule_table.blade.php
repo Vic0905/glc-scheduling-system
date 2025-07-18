@@ -20,7 +20,7 @@
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody> 
                         @php
                             $timeSlots = [
                                 '08:00' => 'time_8_00_8_50',
@@ -37,17 +37,20 @@
                         @endphp
 
                         @foreach($groupedSchedules as $group)
-                            <tr class="hover:bg-green-50 dark:hover:bg-gray-900 transition text-center text-xs">
-                                <td class="px-4 py-2 border-t border-r border-gray-300 dark:border-gray-700">
-                                    <a href="#" onclick="event.preventDefault(); showTeacherStudents({{ $group->first()->teacher->user->id }}, '{{ $group->first()->schedule_date }}')" 
-                                       class="text-blue-600 dark:text-blue-400 hover:underline dark:hover:text-blue-600">
+                            <tr class="hover:bg-green-50 dark:hover:bg-gray-900 transition text-center text-xs align-top">
+                                <td class="px-4 py-2 border-t border-r border-gray-300 dark:border-gray-700 w-40 max-w-[160px]">
+                                    <a href="#"
+                                    onclick="event.preventDefault(); showTeacherStudents({{ $group->first()->teacher->user->id }}, '{{ $group->first()->schedule_date }}')" 
+                                    class="text-blue-600 dark:text-blue-400 hover:underline dark:hover:text-blue-600 break-words">
                                         {{ $group->first()->teacher->name ?? 'N/A' }}
                                     </a>
                                 </td>
-                                <td class="px-4 py-2 border-t border-r border-gray-300 dark:border-gray-700 font-bold">
+
+                                <td class="px-4 py-2 border-t border-r border-gray-300 dark:border-gray-700 font-bold w-32 max-w-[120px] break-words">
                                     {{ $group->first()->room->roomname ?? 'N/A' }}
                                 </td>
-                                <td class="px-4 py-2 border-t border-r border-gray-300 dark:border-gray-700 font-bold">
+
+                                <td class="px-4 py-2 border-t border-r border-gray-300 dark:border-gray-700 font-bold w-36 max-w-[140px] break-words">
                                     {{ $group->first()->schedule_date ?? 'N/A' }}
                                     @if ($group->first()->schedule_date)
                                         <br>
@@ -59,18 +62,68 @@
                                     @php
                                         $scheduledStudents = $group->filter(fn($s) => $s->{$slotKey});
                                     @endphp
-                                    <td class="px-2 py-2 border-t border-r border-gray-300 dark:border-gray-700 align-top">
+                                    <td class="px-2 py-2 border-t border-r border-gray-300 dark:border-gray-700 align-top w-56 max-w-[220px]">
                                         @if($scheduledStudents->isNotEmpty())
                                             @foreach($scheduledStudents as $schedule)
                                                 @php
                                                     $status = $schedule->status ?? 'N/A';
                                                     $isAbsent = in_array($status, ['N/A', 'absent GRP', 'absent MTM']);
                                                     $textColor = $isAbsent ? 'text-red-700 dark:text-red-300' : 'text-green-700 dark:text-green-300';
-                                                    $bgColor = $isAbsent ? 'bg-red-100 dark:bg-red-900' : 'bg-green-100 dark:bg-green-900';
+                                                    $bgColor = $isAbsent ? 'bg-red-50 dark:bg-gray-900' : 'bg-green-50 dark:bg-gray-900';
                                                 @endphp
-                                                <div class="{{ $bgColor }} mb-1 p-1 text-[10px] sm:text-xs md:text-xs rounded">
-                                                    <strong>{{ $schedule->student->name ?? 'N/A' }}</strong><br>
-                                                    <span class="{{ $textColor }}">({{ $status }})</span>
+                                                <div class="{{ $bgColor }} mb-1 p-1 text-[10px] sm:text-xs rounded leading-tight">
+                                                    <div class="flex flex-col space-y-1 text-[11px] sm:text-xs">
+                                                        <!-- Student name -->
+                                                        <span class="font-medium whitespace-nowrap">
+                                                            {{ $schedule->student->name ?? 'N/A' }}
+                                                        </span>
+
+                                                        <!-- Subject -->
+                                                        <span class="whitespace-nowrap">
+                                                            {{ $schedule->subject->subjectname ?? 'N/A' }}
+                                                        </span>
+
+                                                        <!-- Room -->
+                                                        <strong class="whitespace-nowrap">
+                                                            {{ $schedule->subTeacher->room->roomname ?? $schedule->teacher->room->roomname ?? 'No Room' }}
+                                                        </strong>
+                                                    </div>
+
+                                                        <div>
+                                                        @role('teacher')
+                                                            @php
+                                                                $subRoomId = $schedule->subTeacher->room->id ?? null;
+                                                                $mainRoomId = $schedule->teacher->room->id ?? null;
+                                                            @endphp
+
+                                                            @if ($subRoomId === $mainRoomId)
+                                                                <form action="{{ route('schedules.updateStatus', ['id' => $schedule->id]) }}" method="POST" class="flex flex-col gap-2 items-center">
+                                                                    @csrf
+                                                                    @method('PATCH') 
+
+                                                                    <select name="status" 
+                                                                        class="status-select w-full max-w-[150px] rounded-lg border border-gray-300 dark:bg-gray-900 bg-gray-200 px-3 py-2 text-xs text-gray-900 dark:text-gray-100 
+                                                                        dark:hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-500 transition duration-200 ease-in-out"
+                                                                        data-student-id="{{ $schedule->id }}">
+                                                                        <option value="N/A" {{ $schedule->status === 'N/A' ? 'selected' : '' }}>N/A</option>
+                                                                        <option value="present GRP" {{ $schedule->status === 'present GRP' ? 'selected' : '' }}>Present (GRP)</option>
+                                                                        <option value="absent GRP" {{ $schedule->status === 'absent GRP' ? 'selected' : '' }}>Absent (GRP)</option>
+                                                                        <option value="present MTM" {{ $schedule->status === 'present MTM' ? 'selected' : '' }}>Present (MTM)</option>
+                                                                        <option value="absent MTM" {{ $schedule->status === 'absent MTM' ? 'selected' : '' }}>Absent (MTM)</option>
+                                                                    </select>
+
+                                                                    <button type="submit" 
+                                                                        class="text-blue-500 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm cursor-pointer hover:underline">
+                                                                        Update
+                                                                    </button>
+                                                                </form>
+                                                            @else
+                                                                <span class="text-gray-400 italic text-xs">You are not authorized to update this.</span>
+                                                            @endif
+                                                        @endrole
+
+                                                        <span class="{{ $textColor }}">({{ $status }})</span>
+                                                    </div>
                                                 </div>
                                             @endforeach
                                         @else
