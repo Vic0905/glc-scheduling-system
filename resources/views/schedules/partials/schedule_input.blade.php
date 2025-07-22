@@ -24,7 +24,6 @@
                         @endforeach
                     </tr>
                 </thead>
-
                 <tbody>
                     @php 
                         $timeSlots = [
@@ -40,7 +39,6 @@
                             '17:00' => 'time_17_00_17_50',
                         ];
                     @endphp
-
                     @foreach ($rooms as $room)
                         @php
                             $groups = $schedulesByRoom[$room->roomname] ?? collect([]);
@@ -61,7 +59,7 @@
                                 </td>
                                 <td class="px-4 py-3 border border-gray-200 dark:border-gray-600 font-bold text-gray-800 dark:text-gray-200">{{ $room->roomname }}</td>
                                 @foreach ($timeSlots as $time => $slotKey)
-                                    <td class="px-1 py-2 border border-gray-200 dark:border-gray-600 text-center text-xs text-gray-500 dark:text-gray-300">
+                                    <td class="px-1 py-2 border border-gray-200 dark:border-gray-600 text-xs text-gray-500 dark:text-gray-300">
                                         <form class="schedule-form" data-room-id="{{ $room->id }}" data-time-slot="{{ $time }}" data-slot-key="{{ $slotKey }}">
                                             @csrf
                                             <input type="hidden" name="room_id" value="{{ $room->id }}">
@@ -71,10 +69,10 @@
                                             <input type="hidden" name="end_date" value="{{ request('end_date') }}">
                                             <input type="hidden" name="teacher_id" value="">
 
-                                            {{-- TEACHER NAME SHOULD BE POPULATE HERE THEN WHEN VIEW TO THE TEACHER INDEX IS BY ROOM NOT TEACHER --}}
+                                            {{-- this function will enable the dropdown for sub teacher  --}}
                                             <select name="sub_teacher_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-600 
                                             bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
-                                                <option value="">Teacher (optional)</option>
+                                                <option value="">Select Teacher</option>
                                                 @foreach ($teachers->sortBy(fn($t) => $t->user->name) as $teacher)
                                                     <option value="{{ $teacher->user_id }}">{{ $teacher->user->name }}</option>
                                                 @endforeach
@@ -95,11 +93,15 @@
                                                     <option value="{{ $subject->id }}">{{ $subject->subjectname }}</option>
                                                 @endforeach
                                             </select>
+                                             <label class="inline-flex items-start mt-2">
+                                                <input type="checkbox" name="repeat_week" value="1" class="form-checkbox h-3 w-3 text-blue-600">
+                                                <span class="ml-1 text-xs text-gray-700 dark:text-gray-300">Repeat until Friday</span>
+                                             </label>
                                         </form>
                                     </td>
                                 @endforeach
                             </tr>
-                            @else
+                        @else
                             @foreach ($groupedByTeacherAndDate as $group)
                                 <tr class="hover:bg-slate-50 dark:hover:bg-gray-800 align-top transition text-xs">
                                     <td class="px-4 py-2 border-t border-r border-gray-300 dark:border-gray-600 text-center">
@@ -126,15 +128,8 @@
                                                         @else
                                                             <span class="text-gray-500 italic">No Substitute</span>
                                                         @endif
-                                                        {{-- to VIEW THE TEACHER ROOM INSTEAD OF THE TEACHER NAME  --}}
-                                                            {{-- @if($schedule->subTeacher && $schedule->subTeacher->room)
-                                                            <span>{{ $schedule->subTeacher->room->roomname }}</span>
-                                                        @else
-                                                            <span class="text-gray-500 italic">No Room</span>
-                                                        @endif --}} 
-
                                                         <div class="flex space-x-2 mt-1">
-                                                            <button onclick="clearSchedule({{ $schedule->id }}, event)" class="text-blue-600 text-xs hover:underline">Clear</button>
+                                                            <button onclick="editSchedule({{ $schedule->id }})" class="text-blue-500 text-xs hover:underlined">Edit</button>
                                                             <button onclick="deleteSchedule({{ $schedule->id }})" class="text-red-500 text-xs hover:underline">Delete</button>
                                                         </div>
                                                     </div>
@@ -150,7 +145,7 @@
 
                                                     <select name="sub_teacher_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-600 
                                                     bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-blue-500">
-                                                        <option value="">Teacher (optional)</option>
+                                                        <option value="">Select Teacher</option>
                                                         @foreach ($teachers->sortBy(fn($t) => $t->user->name) as $teacher)
                                                             <option value="{{ $teacher->user_id }}">{{ $teacher->user->name }}</option>
                                                         @endforeach
@@ -171,6 +166,10 @@
                                                             <option value="{{ $subject->id }}">{{ $subject->subjectname }}</option>
                                                         @endforeach
                                                     </select>
+                                                        <label class="inline-flex items-left mt-2">
+                                                            <input type="checkbox" name="repeat_week" value="1" class="form-checkbox h-3 w-3 text-blue-600">
+                                                            <span class="ml-1 text-xs text-gray-700 dark:text-gray-300">Repeat until Friday</span>
+                                                        </label>
                                                 </form>
                                             @endif
                                         </td>
@@ -183,16 +182,13 @@
             </table>
         </div>
     </div>
-    <div class="flex justify-end text-xs mt-2 dark:text-gray-300">
-        {{ $rooms->links() }}
-    </div>
 </div>  
 
 
 
 <div id="teacherStudentsModalContainer"></div>
 
-<script>
+{{-- <script>
     function showTeacherStudents(teacherId, scheduleDate) {
         fetch(`/teachers/${teacherId}/students/${scheduleDate}`)
             .then(response => response.text())
@@ -220,4 +216,4 @@
             });
         });
     }
-</script>
+</script> --}}

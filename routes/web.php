@@ -43,7 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/schedules/{id}/status', [ScheduleController::class, 'updateStatus'])->name('schedules.updateStatus');
     Route::delete('/schedules/delete-room-date/{room}/{date}', [ScheduleController::class, 'destroyByRoomAndDate'])->name('schedules.deleteByRoomAndDate');
     // routes/web.php
-    Route::post('/schedules/{schedule}/clear', [ScheduleController::class, 'clear'])->name('schedules.clear');
+  
 
 
 

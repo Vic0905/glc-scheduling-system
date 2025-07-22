@@ -33,7 +33,7 @@ class Schedule extends Model
 ];
 
     
-    public function student()
+    public function student() 
     {
         return $this->belongsTo(Student::class, 'student_id');
     }

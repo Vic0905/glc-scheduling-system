@@ -59,6 +59,7 @@
         </div>
 
     @include('schedules.partials.schedule_input')
+    @include('components.alerts.success')
 
     <script>
         function initializeScheduleFormEvents() {
@@ -184,7 +185,7 @@
                         </select>
 
                         <select name="sub_teacher_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-1">
-                            <option value="">Substitute Teacher (optional)</option>
+                            <option value="">Substitute Teacher</option>
                             ${data.teachers.map(teacher => `<option value="${teacher.user_id}">${teacher.user.name}</option>`).join('')}
                         </select>
                     </form>
