@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Student;
-use App\Models\Teacher;
-use App\Models\Subject;
-use App\Models\ActivityLog; 
 use App\Models\Schedule;
+use App\Models\Student;
+use App\Models\Subject;
+use App\Models\Teacher;
 
 class DashboardController extends Controller
 {
@@ -17,9 +16,8 @@ class DashboardController extends Controller
         $teachersCount = Teacher::count();
         $subjectsCount = Subject::count();
         $schedulesCount = Schedule::count();
+
         // Pass data to the view to display the dashboard
         return view('dashboard', compact('studentsCount', 'teachersCount', 'subjectsCount', 'schedulesCount'));
     }
-
-
 }

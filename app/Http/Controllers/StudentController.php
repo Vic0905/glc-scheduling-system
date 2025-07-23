@@ -8,17 +8,17 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    public function index(Request $request) 
+    public function index(Request $request)
     {
         $studentName = $request->query('student_name');
 
-         // If a student name is provided, filter students by that name
-        $students = Student::query()
-        ->when($studentName, function ($query) use ($studentName) {
-            $query->where('name', 'like', '%' . $studentName . '%');
-        })
-        ->orderBy('name', 'asc')
-        ->get();
+        // If a student name is provided, filter students by that name
+        $students = Student::query() 
+            ->when($studentName, function ($query) use ($studentName) {
+                $query->where('name', 'like', '%'.$studentName.'%');
+            })
+            ->orderBy('name', 'asc')
+            ->get();
 
         $studentCount = $students->count();
 
@@ -37,7 +37,7 @@ class StudentController extends Controller
 
         // Log the activity for creation
         ActivityLog::create([
-            'activity' => 'Student ' . $student->name . ' enrolled',
+            'activity' => 'Student '.$student->name.' enrolled',
             'model_type' => 'Student',
             'model_id' => $student->id,
         ]);
@@ -48,8 +48,9 @@ class StudentController extends Controller
 
     public function edit($id)
     {
-        // find the student by id and pass it to the view for editing purpose 
+        // find the student by id and pass it to the view for editing purpose
         $student = Student::findOrFail($id);
+
         return view('students.edit', compact('student'));
     }
 
@@ -61,7 +62,7 @@ class StudentController extends Controller
 
         // Log the activity for update (optional)
         ActivityLog::create([
-            'activity' => 'Student ' . $student->name . ' updated',
+            'activity' => 'Student '.$student->name.' updated',
             'model_type' => 'Student',
             'model_id' => $student->id,
         ]);
@@ -74,7 +75,7 @@ class StudentController extends Controller
         // find the student by id and delete it from the database
         $student = Student::findOrFail($id);
         $student->delete();
-        
+
         return redirect()->route('students.index')->with('success', 'Student deleted successfully.');
     }
 }

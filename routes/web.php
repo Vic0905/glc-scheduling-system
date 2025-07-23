@@ -1,16 +1,14 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{
-    DashboardController,
-    ProfileController,
-    ScheduleController,
-    StudentController,
-    SubjectController,
-    RoomController,
-    TeacherController,
-    UserController
-};
 
 Route::get('/', function () {
     return view('welcome');
@@ -43,9 +41,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/schedules/{id}/status', [ScheduleController::class, 'updateStatus'])->name('schedules.updateStatus');
     Route::delete('/schedules/delete-room-date/{room}/{date}', [ScheduleController::class, 'destroyByRoomAndDate'])->name('schedules.deleteByRoomAndDate');
     // routes/web.php
-  
-
-
 
     // Teacher-student schedule route
     Route::get('/teachers/{teacherId}/students/{scheduleDate}', [ScheduleController::class, 'showTeacherStudents'])->name('teachers.students');

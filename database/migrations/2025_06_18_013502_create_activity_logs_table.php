@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('activity_logs', function (Blueprint $table) {
-        $table->id();
-        $table->string('activity');
-        $table->string('model_type')->nullable(); // E.g., 'Student', 'Teacher'
-        $table->unsignedBigInteger('model_id')->nullable();
-        $table->timestamps();
-    });
+        Schema::create('activity_logs', function (Blueprint $table) {
+            $table->id();
+            $table->string('activity');
+            $table->string('model_type')->nullable(); // E.g., 'Student', 'Teacher'
+            $table->unsignedBigInteger('model_id')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**

@@ -10,19 +10,18 @@ class RoomController extends Controller
 {
     public function index(Request $request)
     {
-        // get all the rooms 
+        // get all the rooms
         $roomName = $request->query('room_name'); // Fix the query parameter name
 
-          // Query the subjects table, using the correct column name 'subjectname'
-          $rooms = Room::query()
-          ->when($roomName, function ($query) use ($roomName) {
-              $query->where('roomname', 'like', '%' . $roomName . '%');
-          })
-          ->orderBy('roomname', 'asc') // Sort alphabetically
-          ->paginate(10); // Display 5 rooms per page
+        // Query the subjects table, using the correct column name 'subjectname'
+        $rooms = Room::query()
+            ->when($roomName, function ($query) use ($roomName) {
+                $query->where('roomname', 'like', '%'.$roomName.'%');
+            })
+            ->orderBy('roomname', 'asc') // Sort alphabetically
+            ->paginate(10); // Display 5 rooms per page
 
-          $roomCount = $rooms->count(); // Count the number of rooms
-    
+        $roomCount = $rooms->count(); // Count the number of rooms
 
         return view('rooms.index', compact('rooms', 'roomName', 'roomCount'));
     }
@@ -39,7 +38,7 @@ class RoomController extends Controller
 
         // Log the activity
         ActivityLog::create([
-            'activity' => 'Room ' . $room->name . ' created',
+            'activity' => 'Room '.$room->name.' created',
             'model_type' => 'Room',
             'model_id' => $room->id,
         ]);
@@ -50,8 +49,9 @@ class RoomController extends Controller
 
     public function edit($id)
     {
-        // find the subject by the id passed in the URL 
+        // find the subject by the id passed in the URL
         $room = Room::findOrFail($id);
+
         return view('rooms.edit', compact('room'));
     }
 
@@ -63,19 +63,19 @@ class RoomController extends Controller
 
         // Log the activity for update
         ActivityLog::create([
-            'activity' => 'Room ' . $room->name . ' updated',
+            'activity' => 'Room '.$room->name.' updated',
             'model_type' => 'Room',
             'model_id' => $room->id,
         ]);
 
         return redirect()->route('rooms.index')->with('success', 'Room updated successfully.');
     }
-    public function destroy(Room $room) 
+
+    public function destroy(Room $room)
     {
- 
+
         $room->delete();
+
         return redirect()->route('rooms.index')->with('success', 'Room deleted successfully.');
     }
-    
-    
 }

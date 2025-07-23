@@ -14,15 +14,14 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with('roles')->get();
+
         return view('users.index', compact('users'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -48,6 +47,7 @@ class UserController extends Controller
 
         $user = User::find($id);
         $roles = Role::orderBy('name')->get();
+
         return view('users.edit', compact('user', 'roles'));
     }
 
@@ -74,12 +74,12 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         $user = User::findOrFail($id); // Find the user
-    
+
         // Optional: Remove all roles before deleting (if using Spatie)
-        $user->roles()->detach(); 
-    
+        $user->roles()->detach();
+
         $user->delete(); // Delete the user
-    
+
         return redirect()->route('users.index')->with('success', 'User deleted successfully!');
     }
 }

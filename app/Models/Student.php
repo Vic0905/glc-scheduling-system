@@ -12,9 +12,9 @@ class Student extends Model
     {
         return $this->hasMany(Schedule::class);
     }
+
     public function teacher()
     {
         return $this->belongsTo(teacher::class);
     }
 }
-

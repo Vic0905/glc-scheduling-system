@@ -20,22 +20,21 @@ class Teacher extends Model
 
     public function students()
     {
-        return $this->hasMany(Student::class); 
+        return $this->hasMany(Student::class);
     }
 
     public function subjects()
     {
-        return $this->hasMany(Subject::class); 
+        return $this->hasMany(Subject::class);
     }
-    
+
     public function schedules()
     {
         return $this->hasMany(Schedule::class);
     }
 
-    public function room() 
+    public function room()
     {
         return $this->belongsTo(Room::class, 'room_id');
     }
-
 }
