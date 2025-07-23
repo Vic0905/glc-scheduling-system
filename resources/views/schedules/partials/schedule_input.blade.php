@@ -129,7 +129,7 @@
                                                             <span class="text-gray-500 italic">No Substitute</span>
                                                         @endif
                                                         <div class="flex space-x-2 mt-1">
-                                                            <button onclick="editSchedule({{ $schedule->id }})" class="text-blue-500 text-xs hover:underlined">Edit</button>
+                                                            {{-- <button onclick="editSchedule({{ $schedule->id }})" class="text-blue-500 text-xs hover:underlined">Edit</button> --}}
                                                             <button onclick="deleteSchedule({{ $schedule->id }})" class="text-red-500 text-xs hover:underline">Delete</button>
                                                         </div>
                                                     </div>
@@ -180,6 +180,9 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+        <div class="mt-4">
+            {{ $rooms->withQueryString()->links() }}
         </div>
     </div>
 </div>  

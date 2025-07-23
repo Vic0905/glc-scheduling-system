@@ -16,81 +16,78 @@ use Illuminate\Support\Facades\Auth;
 
 class ScheduleController extends Controller
 {
-public function index(Request $request)
-{
-    $user = Auth::user();
+    public function index(Request $request)
+    {
+        $user = Auth::user();
 
-    $teacherName = $request->query('teacher_name', '');
-    $studentName = $request->query('student_name', '');
-    $date = $request->input('schedule_date', '');
+        $teacherName = $request->query('teacher_name', '');
+        $studentName = $request->query('student_name', '');
+        $date = $request->input('schedule_date', '');
 
-    $startDate = $request->input('start_date') ?? now()->toDateString();
-    $endDate = $request->input('end_date') ?? now()->toDateString();
+        $startDate = $request->input('start_date') ?? now()->toDateString();
+        $endDate = $request->input('end_date') ?? now()->toDateString();
 
-    $query = Schedule::with([
-        'student',
-        'teacher.user',
-        'teacher.room',
-        'subTeacher.user',
-        'subTeacher.room',
-        'subject',
-        'room'
-    ])->where('schedule_state', '!=', 'cleared');
+        $query = Schedule::with([
+            'student',
+            'teacher.user',
+            'teacher.room',
+            'subTeacher.user',
+            'subTeacher.room',
+            'subject',
+            'room'
+        ])->where('schedule_state', '!=', 'cleared');
 
-    if ($date) {
-        $query->whereDate('schedule_date', $date);
-    }
+        if ($date) {
+            $query->whereDate('schedule_date', $date);
+        }
 
-    if ($startDate && $endDate) {
-        $query->whereBetween('schedule_date', [$startDate, $endDate]);
-    }
+        if ($startDate && $endDate) {
+            $query->whereBetween('schedule_date', [$startDate, $endDate]);
+        }
 
-    if ($teacherName) {
-        $query->whereHas('teacher.user', function ($q) use ($teacherName) {
-            $q->where('name', 'like', '%' . $teacherName . '%');
+        if ($teacherName) {
+            $query->whereHas('teacher.user', function ($q) use ($teacherName) {
+                $q->where('name', 'like', '%' . $teacherName . '%');
+            });
+        }
+
+        if ($studentName) {
+            $query->whereHas('student', function ($q) use ($studentName) {
+                $q->where('name', 'like', '%' . $studentName . '%');
+            });
+        }
+
+        $schedules = $query->get();
+
+        // Duplicate sub teacher schedule
+        $subSchedules = $schedules->filter(fn($s) => $s->sub_teacher_id)->map(function ($s) {
+            $clone = clone $s;
+            $clone->teacher_id = $s->sub_teacher_id;
+            $clone->teacher = $s->subTeacher;
+            $clone->room = $s->subTeacher->room ?? $s->room;
+            return $clone;
         });
-    }
 
-    if ($studentName) {
-        $query->whereHas('student', function ($q) use ($studentName) {
-            $q->where('name', 'like', '%' . $studentName . '%');
+        $mergedSchedules = $schedules->merge($subSchedules);
+
+        // ✅ Only show schedules where teacher is current user and weekday only (Mon-Fri)
+        if ($user->hasRole('teacher')) {
+            $mergedSchedules = $mergedSchedules->filter(function ($schedule) use ($user) {
+                if (!$schedule->schedule_date || !$schedule->teacher) return false;
+
+                $isOwner = $schedule->teacher->user_id === $user->id;
+                $dayOfWeek = \Carbon\Carbon::parse($schedule->schedule_date)->dayOfWeek;
+
+                return $isOwner && $dayOfWeek >= 1 && $dayOfWeek <= 5; // Monday to Friday
+            });
+        }
+
+        $groupedSchedules = $mergedSchedules->groupBy(function ($schedule) {
+            return $schedule->teacher->name . '-' . $schedule->schedule_date;
         });
+
+        return view('schedules.index', compact('groupedSchedules', 'teacherName', 'studentName', 'date', 'startDate', 'endDate'));
     }
-
-    $schedules = $query->get();
-
-    // Duplicate sub teacher schedule
-    $subSchedules = $schedules->filter(fn($s) => $s->sub_teacher_id)->map(function ($s) {
-        $clone = clone $s;
-        $clone->teacher_id = $s->sub_teacher_id;
-        $clone->teacher = $s->subTeacher;
-        $clone->room = $s->subTeacher->room ?? $s->room;
-        return $clone;
-    });
-
-    $mergedSchedules = $schedules->merge($subSchedules);
-
-    // ✅ Only show schedules where teacher is current user and weekday only (Mon-Fri)
-    if ($user->hasRole('teacher')) {
-        $mergedSchedules = $mergedSchedules->filter(function ($schedule) use ($user) {
-            if (!$schedule->schedule_date || !$schedule->teacher) return false;
-
-            $isOwner = $schedule->teacher->user_id === $user->id;
-            $dayOfWeek = \Carbon\Carbon::parse($schedule->schedule_date)->dayOfWeek;
-
-            return $isOwner && $dayOfWeek >= 1 && $dayOfWeek <= 5; // Monday to Friday
-        });
-    }
-
-    $groupedSchedules = $mergedSchedules->groupBy(function ($schedule) {
-        return $schedule->teacher->name . '-' . $schedule->schedule_date;
-    });
-
-    return view('schedules.index', compact('groupedSchedules', 'teacherName', 'studentName', 'date', 'startDate', 'endDate'));
-}
-
-
-
 
     public function create()
     {
@@ -103,87 +100,86 @@ public function index(Request $request)
         return view('schedules.create', compact('students', 'teachers', 'subjects', 'rooms'));
     }
 
-public function store(Request $request)
-{
-    $timeSlots = [
-        '08:00' => 'time_8_00_8_50',
-        '09:00' => 'time_9_00_9_50',
-        '10:00' => 'time_10_00_10_50',
-        '11:00' => 'time_11_00_11_50',
-        '12:00' => 'time_12_00_12_50',
-        '13:00' => 'time_13_00_13_50',
-        '14:00' => 'time_14_00_14_50',
-        '15:00' => 'time_15_00_15_50',
-        '16:00' => 'time_16_00_16_50',
-        '17:00' => 'time_17_00_17_50',
-    ];
+    public function store(Request $request)
+    {
+        $timeSlots = [
+            '08:00' => 'time_8_00_8_50',
+            '09:00' => 'time_9_00_9_50',
+            '10:00' => 'time_10_00_10_50',
+            '11:00' => 'time_11_00_11_50',
+            '12:00' => 'time_12_00_12_50',
+            '13:00' => 'time_13_00_13_50',
+            '14:00' => 'time_14_00_14_50',
+            '15:00' => 'time_15_00_15_50',
+            '16:00' => 'time_16_00_16_50',
+            '17:00' => 'time_17_00_17_50',
+        ];
+        // This will validate a the records that are inputted this will ensure if the 
+        $validatedData = $request->validate([
+            'schedule_date' => 'required|date',
+            'student_id' => 'required|exists:students,id',
+            'teacher_id' => 'required|exists:users,id',
+            'sub_teacher_id' => 'nullable|exists:users,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'room_id' => 'required|exists:rooms,id',
+            'schedule_time' => ['required', Rule::in(array_keys($timeSlots))],
+            'repeat_week' => 'nullable' // checkbox this can be null to ensure it can create schedule even if individual or bulking
+        ]);
 
-    $validatedData = $request->validate([
-        'schedule_date' => 'required|date',
-        'student_id' => 'required|exists:students,id',
-        'teacher_id' => 'required|exists:users,id',
-        'sub_teacher_id' => 'nullable|exists:users,id',
-        'subject_id' => 'required|exists:subjects,id',
-        'room_id' => 'required|exists:rooms,id',
-        'schedule_time' => ['required', Rule::in(array_keys($timeSlots))],
-        'repeat_week' => 'nullable' // checkbox
-    ]);
+        $timeSlotColumn = $timeSlots[$request->schedule_time];
+        $baseData = array_merge($validatedData, [
+            $timeSlotColumn => 1,
+            'status' => 'N/A',
+            'schedule_state' => 'active',
+        ]);
 
-    $timeSlotColumn = $timeSlots[$request->schedule_time];
-    $baseData = array_merge($validatedData, [
-        $timeSlotColumn => 1,
-        'status' => 'N/A',
-        'schedule_state' => 'active',
-    ]);
+        $startDate = \Carbon\Carbon::parse($validatedData['schedule_date']);
 
-    $startDate = \Carbon\Carbon::parse($validatedData['schedule_date']);
+        $datesToSchedule = [];
 
-    $datesToSchedule = [];
-
-    if ($request->has('repeat_week')) {
-        // Get the upcoming Friday of the same week
-        $friday = $startDate->copy()->endOfWeek(Carbon::FRIDAY);
-        for ($date = $startDate->copy(); $date->lte($friday); $date->addDay()) {
-            if ($date->isWeekend()) continue; // skip Saturday & Sunday
-            $datesToSchedule[] = $date->copy();
-        }
-    } else {
-        $datesToSchedule[] = $startDate;
-    }
-
-    $createdSchedules = [];
-    $skippedDates = [];
-
-    foreach ($datesToSchedule as $date) {
-        $baseData['schedule_date'] = $date->toDateString();
-
-        $conflict = Schedule::where('schedule_date', $date->toDateString())
-            ->where(function ($query) use ($request, $timeSlotColumn) {
-                $query->where(function ($q) use ($request, $timeSlotColumn) {
-                    $q->where('teacher_id', $request->teacher_id)
-                        ->where($timeSlotColumn, 1);
-                })->orWhere(function ($q) use ($request, $timeSlotColumn) {
-                    $q->where('student_id', $request->student_id)
-                        ->where($timeSlotColumn, 1);
-                });
-            })->exists();
-
-        if ($conflict) {
-            $skippedDates[] = $date->format('l (Y-m-d)');
-            continue;
+        if ($request->has('repeat_week')) {
+            // Get the upcoming Friday of the same week
+            $friday = $startDate->copy()->endOfWeek(Carbon::FRIDAY);
+            for ($date = $startDate->copy(); $date->lte($friday); $date->addDay()) {
+                if ($date->isWeekend()) continue; // skip Saturday & Sunday
+                $datesToSchedule[] = $date->copy();
+            }
+        } else {
+            $datesToSchedule[] = $startDate;
         }
 
-        $createdSchedules[] = Schedule::create($baseData);
+        $createdSchedules = [];
+        $skippedDates = [];
+
+        foreach ($datesToSchedule as $date) {
+            $baseData['schedule_date'] = $date->toDateString();
+
+            $conflict = Schedule::where('schedule_date', $date->toDateString())
+                ->where(function ($query) use ($request, $timeSlotColumn) {
+                    $query->where(function ($q) use ($request, $timeSlotColumn) {
+                        $q->where('teacher_id', $request->teacher_id)
+                            ->where($timeSlotColumn, 1);
+                    })->orWhere(function ($q) use ($request, $timeSlotColumn) {
+                        $q->where('student_id', $request->student_id)
+                            ->where($timeSlotColumn, 1);
+                    });
+                })->exists();
+
+            if ($conflict) {
+                $skippedDates[] = $date->format('l (Y-m-d)');
+                continue;
+            }
+
+            $createdSchedules[] = Schedule::create($baseData);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => count($createdSchedules) . ' schedule(s) created.',
+            'skipped' => $skippedDates,
+            'data' => $createdSchedules
+        ]);
     }
-
-    return response()->json([
-        'success' => true,
-        'message' => count($createdSchedules) . ' schedule(s) created.',
-        'skipped' => $skippedDates,
-        'data' => $createdSchedules
-    ]);
-}
-
 
     public function destroy(Schedule $schedule)
     {
@@ -395,7 +391,7 @@ public function store(Request $request)
             $roomQuery->whereRaw('1 = 0'); // No rooms shown if no match
         }
 
-        $rooms = $roomQuery->paginate(50);
+        $rooms = $roomQuery->paginate(30);
 
         // Group by room for Blade view
         $schedulesByRoom = $schedules->groupBy(function ($schedule) {
