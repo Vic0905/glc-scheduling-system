@@ -180,9 +180,9 @@
                     @endforeach
                 </tbody>
             </table>
-        </div>
-        <div class="mt-4">
+            <div class="mt-4">
             {{ $rooms->withQueryString()->links() }}
+        </div>
         </div>
     </div>
 </div>  

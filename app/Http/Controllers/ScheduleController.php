@@ -86,11 +86,29 @@ class ScheduleController extends Controller
             });
         }
 
+        // Get all rooms sorted by room name
+        $rooms = Room::orderBy('roomname', 'asc')->get(); // ✅ Define $rooms
+
+        // Sort mergedSchedules by room name
+        $mergedSchedules = $mergedSchedules->sortBy(function ($schedule) {
+            return $schedule->room->roomname ?? '';
+        });
+
+        // Group by teacher name + date
         $groupedSchedules = $mergedSchedules->groupBy(function ($schedule) {
             return $schedule->teacher->name.'-'.$schedule->schedule_date;
         });
 
-        return view('schedules.index', compact('groupedSchedules', 'teacherName', 'studentName', 'date', 'startDate', 'endDate'));
+        return view('schedules.index', compact(
+            'groupedSchedules',
+            'rooms', 
+            'teacherName', 
+            'studentName', 
+            'date', 
+            'startDate', 
+            'endDate'
+        ));
+
     }
 
     public function create()
