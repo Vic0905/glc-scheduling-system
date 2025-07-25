@@ -17,7 +17,7 @@
                             @endphp
                             @foreach($timeSlots as $slot)
                                 <th class="border border-gray-300 dark:border-gray-600 bg-slate-100 dark:bg-gray-800 px-3 py-2">
-                                    {{ str_replace('-', ' to ', $slot) }}
+                                    {{ str_replace('-', ' - ', $slot) }}
                                 </th>
                             @endforeach
                         </tr>
