@@ -36,6 +36,11 @@ return new class extends Migration
             $table->boolean('time_15_00_15_50')->default(false);
             $table->boolean('time_16_00_16_50')->default(false);
             $table->boolean('time_17_00_17_50')->default(false);
+            $table->boolean('time_18_00_18_50')->default(false);
+            $table->boolean('time_19_00_19_50')->default(false);
+            $table->boolean('time_20_00_20_50')->default(false);
+            $table->boolean('time_21_00_21_50')->default(false);
+
 
             // Timestamps and soft deletes
             $table->timestamps();

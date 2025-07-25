@@ -7,32 +7,23 @@
                         <tr>
                             <th class="border border-gray-300 dark:border-gray-600 bg-slate-100 dark:bg-gray-800 px-3 py-2">Teacher</th>
                             <th class="border border-gray-300 dark:border-gray-600 bg-slate-100 dark:bg-gray-800 px-3 py-2">Schedule Date</th>
-                            @foreach(['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'] as $time)
-                                @php
-                                    $startTime = \Carbon\Carbon::createFromFormat('H:i', $time);
-                                    $endTime = $startTime->copy()->addMinutes(50);
-                                @endphp
-                                <th class="border border-gray-300 dark:border-gray-600 bg-slate-100 dark:bg-gray-800 px-3 py-2p">
-                                    {{ $startTime->format('H:i') }}<br>to<br>{{ $endTime->format('H:i') }}
+                            @php
+                                $timeSlots = [
+                                    '08:00-08:50', '09:00-09:50', '10:00-10:50', '11:00-11:50', '12:00-12:50',
+                                    '13:00-13:50', '14:00-14:50', '15:00-15:50', '16:00-16:50', '17:00-17:50',
+                                    '18:00-18:50', '19:00-19:50', '20:00-20:50', '21:00-21:50',
+                                    
+                                ];
+                            @endphp
+                            @foreach($timeSlots as $slot)
+                                <th class="border border-gray-300 dark:border-gray-600 bg-slate-100 dark:bg-gray-800 px-3 py-2">
+                                    {{ str_replace('-', ' to ', $slot) }}
                                 </th>
                             @endforeach
                         </tr>
                     </thead>
-                    <tbody> 
+                    <tbody>
                         @php
-                            $timeSlots = [
-                                '08:00' => 'time_8_00_8_50',
-                                '09:00' => 'time_9_00_9_50',
-                                '10:00' => 'time_10_00_10_50',
-                                '11:00' => 'time_11_00_11_50',
-                                '12:00' => 'time_12_00_12_50',
-                                '13:00' => 'time_13_00_13_50',
-                                '14:00' => 'time_14_00_14_50',
-                                '15:00' => 'time_15_00_15_50',
-                                '16:00' => 'time_16_00_16_50',
-                                '17:00' => 'time_17_00_17_50',
-                            ];
-
                             use Carbon\Carbon;
 
                             $start = isset($startDate) ? Carbon::parse($startDate) : Carbon::now();
@@ -50,7 +41,7 @@
                             @php
                                 $groups = $groupedByDate[$date] ?? collect();
                                 $rowCount = $groups->count();
-                                $formattedDate = \Carbon\Carbon::parse($date)->format('l');
+                                $formattedDate = Carbon::parse($date)->format('l');
                             @endphp
 
                             @if($groups->isEmpty())
@@ -61,24 +52,21 @@
                             @else
                                 @foreach($groups as $i => $group)
                                     <tr class="hover:bg-green-50 dark:hover:bg-gray-900 transition text-center text-xs align-middle">
-                                        {{-- Teacher --}}
                                         <td class="px-4 py-2 border-t border-r border-gray-300 dark:border-gray-700 w-40 max-w-[160px]">
                                             {{ $group->first()->teacher->name ?? 'N/A' }}
                                         </td>
 
-                                        {{-- Schedule Date --}}
                                         @if ($i === 0)
                                             <td class="px-4 py-2 border-t border-r border-gray-400 dark:border-gray-700 font-bold w-36 max-w-[140px] break-words align-middle bg-slate-50 dark:bg-gray-800 text-sm" rowspan="{{ $rowCount }}">
-                                                {{ \Carbon\Carbon::parse($date)->format('F j, Y') }}
+                                                {{ Carbon::parse($date)->format('F j, Y') }}
                                                 <br>
                                                 <span class="text-red-500">({{ $formattedDate }})</span>
                                             </td>
                                         @endif
 
-                                        {{-- Time Slots --}}
-                                        @foreach($timeSlots as $time => $slotKey)
+                                        @foreach($timeSlots as $slot)
                                             @php
-                                                $scheduledStudents = $group->filter(fn($s) => $s->{$slotKey});
+                                                $scheduledStudents = $group->filter(fn($s) => $s->time_slot === $slot);
                                             @endphp
                                             <td class="px-2 py-2 border-t border-r border-gray-300 dark:border-gray-700 w-56 max-w-[220px]">
                                                 @if($scheduledStudents->isNotEmpty())
@@ -111,8 +99,8 @@
                                                                         <form action="{{ route('schedules.updateStatus', ['id' => $schedule->id]) }}" method="POST" class="flex flex-col gap-2 items-center">
                                                                             @csrf
                                                                             @method('PATCH')
-                                                                            <select name="status" 
-                                                                                class="status-select w-full max-w-[150px] rounded-lg border border-gray-300 dark:bg-gray-900 bg-gray-200 px-3 py-2 text-xs text-gray-900 dark:text-gray-100 
+                                                                            <select name="status"
+                                                                                class="status-select w-full max-w-[150px] rounded-lg border border-gray-300 dark:bg-gray-900 bg-gray-200 px-3 py-2 text-xs text-gray-900 dark:text-gray-100
                                                                                 dark:hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-500 transition duration-200 ease-in-out"
                                                                                 data-student-id="{{ $schedule->id }}">
                                                                                 <option value="N/A" {{ $schedule->status === 'N/A' ? 'selected' : '' }}>N/A</option>
@@ -121,7 +109,7 @@
                                                                                 <option value="present MTM" {{ $schedule->status === 'present MTM' ? 'selected' : '' }}>Present (MTM)</option>
                                                                                 <option value="absent MTM" {{ $schedule->status === 'absent MTM' ? 'selected' : '' }}>Absent (MTM)</option>
                                                                             </select>
-                                                                            <button type="submit" 
+                                                                            <button type="submit"
                                                                                 class="text-blue-500 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 text-sm cursor-pointer hover:underline">
                                                                                 Update
                                                                             </button>
@@ -150,7 +138,3 @@
         </div>
     </div>
 </div>
-
-@include('components.alerts.success')
-
-
