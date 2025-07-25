@@ -48,7 +48,8 @@
                         @if ($groupedByTeacherAndDate->isEmpty())
                             <tr>
                                 <td class="px-4 py-3 border border-gray-200 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-300">
-                                    <select name="teacher_id" class="teacher-select block w-full text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <select name="teacher_id" class="teacher-select block w-full text-xs font-medium text-gray-700 dark:text-gray-200 bg-white 
+                                    dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option value="" selected class="text-gray-400 dark:text-gray-500 text-center">Choose a Teacher</option>
                                         @foreach($teachers->sortBy('name') as $teacher)
                                             <option value="{{ $teacher->user_id }}" data-room-id="{{ $teacher->room_id }}">
@@ -76,21 +77,24 @@
                                                     <input type="hidden" name="teacher_id" value="">
 
                                                     {{-- Selects --}}
-                                                    <select name="sub_teacher_id" class="block w-full text-xs py-1 px-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+                                                    <select name="sub_teacher_id" class="block w-full text-xs py-1 px-1 rounded-lg border border-gray-300
+                                                     dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
                                                         <option value="">Select Teacher</option>
                                                         @foreach ($teachers->sortBy(fn($t) => $t->user->name) as $teacher)
                                                             <option value="{{ $teacher->user_id }}">{{ $teacher->user->name }}</option>
                                                         @endforeach
                                                     </select>
 
-                                                    <select name="student_id" class="block w-full text-xs py-1 px-1 mb-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
+                                                    <select name="student_id" class="block w-full text-xs py-1 px-1 mb-1 rounded-lg border border-gray-300
+                                                     dark:border-gray-700 bg-white dark:bg-gray-900">
                                                         <option value="">Select Student</option>
                                                         @foreach($students->sortBy('name') as $student)
                                                             <option value="{{ $student->id }}">{{ $student->name }}</option>
                                                         @endforeach
                                                     </select>
 
-                                                    <select name="subject_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
+                                                    <select name="subject_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300
+                                                     dark:border-gray-700 bg-white dark:bg-gray-900">
                                                         <option value="">Select Subject</option>
                                                         @foreach($subjects->sortBy('subjectname') as $subject)
                                                             <option value="{{ $subject->id }}">{{ $subject->subjectname }}</option>
@@ -154,21 +158,24 @@
                                                             <input type="hidden" name="schedule_date" value="{{ $group->first()->schedule_date }}">
 
                                                             {{-- Selects --}}
-                                                            <select name="sub_teacher_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
+                                                            <select name="sub_teacher_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300
+                                                             dark:border-gray-700 bg-white dark:bg-gray-900">
                                                                 <option value="">Select Teacher</option>
                                                                 @foreach ($teachers->sortBy(fn($t) => $t->user->name) as $teacher)
                                                                     <option value="{{ $teacher->user_id }}">{{ $teacher->user->name }}</option>
                                                                 @endforeach
                                                             </select>
 
-                                                            <select name="student_id" class="block w-full text-xs py-1 px-2 mb-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
+                                                            <select name="student_id" class="block w-full text-xs py-1 px-2 mb-1 rounded-lg border border-gray-300
+                                                             dark:border-gray-700 bg-white dark:bg-gray-900">
                                                                 <option value="">Select Student</option>
                                                                 @foreach($students->sortBy('name') as $student)
                                                                     <option value="{{ $student->id }}">{{ $student->name }}</option>
                                                                 @endforeach
                                                             </select>
 
-                                                            <select name="subject_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900">
+                                                            <select name="subject_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300
+                                                             dark:border-gray-700 bg-white dark:bg-gray-900">
                                                                 <option value="">Select Subject</option>
                                                                 @foreach($subjects->sortBy('subjectname') as $subject)
                                                                     <option value="{{ $subject->id }}">{{ $subject->subjectname }}</option>
