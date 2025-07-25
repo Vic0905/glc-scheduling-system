@@ -142,7 +142,7 @@
                                                             @endif
                                                         </div>
                                                         <div class="flex space-x-2 mt-1">
-                                                            <button onclick="deleteSchedule({{ $schedule->id }})" class="text-red-500 text-xs ml-12 hover:underline">Delete</button>
+                                                            <button onclick="deleteSchedule({{ $schedule->id }})" class="text-red-500 text-xs ml-8 hover:underline">Delete</button>
                                                         </div>
                                                     </div>
                                                 @endforeach

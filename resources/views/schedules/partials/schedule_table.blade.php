@@ -75,7 +75,7 @@
                                                             $status = $schedule->status ?? 'N/A';
                                                             $isAbsent = in_array($status, ['N/A', 'absent GRP', 'absent MTM']);
                                                             $textColor = $isAbsent ? 'text-red-700 dark:text-red-300' : 'text-green-700 dark:text-green-300';
-                                                            $bgColor = $isAbsent ? 'bg-red-50 dark:bg-gray-900' : 'bg-green-50 dark:bg-gray-900';
+                                                            $bgColor = $isAbsent ? 'bg-red-0 dark:bg-gray-900' : 'bg-green-0 dark:bg-gray-900';
                                                         @endphp
                                                         <div class="{{ $bgColor }} mb-1 p-1 text-[10px] sm:text-xs rounded leading-tight">
                                                             <div class="flex flex-col space-y-1 text-[11px] sm:text-xs">
@@ -123,7 +123,7 @@
                                                         </div>
                                                     @endforeach
                                                 @else
-                                                    <span class="text-gray-400 dark:text-gray-500 italic align-middle">No Schedule</span>
+                                                    <span class="text-gray-400 dark:text-gray-500 italic align-middle">----</span>
                                                 @endif
                                             </td>
                                         @endforeach

@@ -394,7 +394,7 @@ class ScheduleController extends Controller
             $roomQuery->whereRaw('1 = 0'); // No rooms shown if no match
         }
 
-        $rooms = $roomQuery->paginate(30);
+        $rooms = $roomQuery->paginate(50);
 
         // Group by room for Blade view
         $schedulesByRoom = $schedules->groupBy(function ($schedule) {
