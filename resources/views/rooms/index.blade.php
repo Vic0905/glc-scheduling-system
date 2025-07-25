@@ -47,7 +47,7 @@
                     @endrole
                 </div>
                 <!-- Room Table -->
-                <div class="overflow-x-auto overflow-y-auto max-h-96 bg-white dark:bg-gray-900 shadow-lg rounded-lg">
+                <div class="overflow-x-auto overflow-y-auto max-h-200 bg-white dark:bg-gray-900 shadow-lg rounded-lg">
                     <table class="min-w-full table-auto border-collapse border border-gray-300 dark:border-gray-700">
                         <thead class="sticky top-0 bg-slate-100 dark:bg-gray-800 text-gray-900 dark:text-white z-10">
                             <tr>

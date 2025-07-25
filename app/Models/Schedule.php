@@ -12,25 +12,16 @@ class Schedule extends Model
     protected $fillable = [
         'student_id',
         'teacher_id',
-        'sub_teacher_id', // ✅ Add this line
+        'sub_teacher_id',
         'room_id',
         'student_room_id',
         'subject_id',
         'schedule_date',
-        'schedule_time',
+        'time_slot', // ⬅️ This replaces all individual time columns
         'status',
-        'schedule_state', // ✅ Add this line
-        'time_8_00_8_50',
-        'time_9_00_9_50',
-        'time_10_00_10_50',
-        'time_11_00_11_50',
-        'time_12_00_12_50',
-        'time_13_00_13_50',
-        'time_14_00_14_50',
-        'time_15_00_15_50',
-        'time_16_00_16_50',
-        'time_17_00_17_50',
+        'schedule_state',
     ];
+
 
     public function student()
     {

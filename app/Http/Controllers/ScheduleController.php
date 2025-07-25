@@ -124,19 +124,6 @@ class ScheduleController extends Controller
 
     public function store(Request $request)
     {
-        $timeSlots = [
-            '08:00' => 'time_8_00_8_50',
-            '09:00' => 'time_9_00_9_50',
-            '10:00' => 'time_10_00_10_50',
-            '11:00' => 'time_11_00_11_50',
-            '12:00' => 'time_12_00_12_50',
-            '13:00' => 'time_13_00_13_50',
-            '14:00' => 'time_14_00_14_50',
-            '15:00' => 'time_15_00_15_50',
-            '16:00' => 'time_16_00_16_50',
-            '17:00' => 'time_17_00_17_50',
-        ];
-        // This will validate a the records that are inputted this will ensure if the
         $validatedData = $request->validate([
             'schedule_date' => 'required|date',
             'student_id' => 'required|exists:students,id',
@@ -144,28 +131,23 @@ class ScheduleController extends Controller
             'sub_teacher_id' => 'nullable|exists:users,id',
             'subject_id' => 'required|exists:subjects,id',
             'room_id' => 'required|exists:rooms,id',
-            'schedule_time' => ['required', Rule::in(array_keys($timeSlots))],
-            'repeat_week' => 'nullable', // checkbox this can be null to ensure it can create schedule even if individual or bulking
+            'time_slot' => ['required', 'string'],
+            'repeat_week' => 'nullable',
         ]);
 
-        $timeSlotColumn = $timeSlots[$request->schedule_time];
         $baseData = array_merge($validatedData, [
-            $timeSlotColumn => 1,
             'status' => 'N/A',
             'schedule_state' => 'active',
         ]);
 
         $startDate = \Carbon\Carbon::parse($validatedData['schedule_date']);
-
         $datesToSchedule = [];
 
+        // Repeat scheduling from startDate until Friday (weekdays only)
         if ($request->has('repeat_week')) {
-            // Get the upcoming Friday of the same week
-            $friday = $startDate->copy()->endOfWeek(Carbon::FRIDAY);
+            $friday = $startDate->copy()->endOfWeek(\Carbon\Carbon::FRIDAY);
             for ($date = $startDate->copy(); $date->lte($friday); $date->addDay()) {
-                if ($date->isWeekend()) {
-                    continue;
-                } // skip Saturday & Sunday
+                if ($date->isWeekend()) continue;
                 $datesToSchedule[] = $date->copy();
             }
         } else {
@@ -176,31 +158,41 @@ class ScheduleController extends Controller
         $skippedDates = [];
 
         foreach ($datesToSchedule as $date) {
-            $baseData['schedule_date'] = $date->toDateString();
-
+            // Conflict check for teacher, sub-teacher, student, and room
             $conflict = Schedule::where('schedule_date', $date->toDateString())
-                ->where(function ($query) use ($request, $timeSlotColumn) {
-                    $query->where(function ($q) use ($request, $timeSlotColumn) {
-                        $q->where('teacher_id', $request->teacher_id)
-                            ->where($timeSlotColumn, 1);
-                    })->orWhere(function ($q) use ($request, $timeSlotColumn) {
-                        $q->where('student_id', $request->student_id)
-                            ->where($timeSlotColumn, 1);
-                    });
-                })->exists();
+                ->where('time_slot', $validatedData['time_slot'])
+                ->where(function ($query) use ($validatedData) {
+                    $query->where('teacher_id', $validatedData['teacher_id'])
+                        ->orWhere('student_id', $validatedData['student_id'])
+                        ->orWhere('room_id', $validatedData['room_id']);
+
+                    if (!empty($validatedData['sub_teacher_id'])) {
+                        $query->orWhere('sub_teacher_id', $validatedData['sub_teacher_id']);
+                    }
+                })
+                ->exists();
 
             if ($conflict) {
                 $skippedDates[] = $date->format('l (Y-m-d)');
-
                 continue;
             }
 
+            $baseData['schedule_date'] = $date->toDateString();
             $createdSchedules[] = Schedule::create($baseData);
+        }
+
+        // Handle case where no schedules were created
+        if (count($createdSchedules) === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'All schedule slots are already taken. No new schedules were created.',
+                'skipped' => $skippedDates,
+            ], 409);
         }
 
         return response()->json([
             'success' => true,
-            'message' => count($createdSchedules).' schedule(s) created.',
+            'message' => count($createdSchedules) . ' schedule(s) created successfully.',
             'skipped' => $skippedDates,
             'data' => $createdSchedules,
         ]);
@@ -426,6 +418,7 @@ class ScheduleController extends Controller
 
         return view('schedules.input', compact(
             'schedulesByRoom',
+            'schedules',
             'rooms',
             'teacherName',
             'studentName',
@@ -436,7 +429,7 @@ class ScheduleController extends Controller
             'endDate'
         ));
     }
-
+ 
     public function destroyByRoomAndDate($roomId, $scheduleDate)
     {
         // Find schedules matching the room and date
@@ -469,3 +462,4 @@ class ScheduleController extends Controller
         return response()->json(['success' => true, 'message' => 'Schedules deleted successfully.']);
     }
 }
+ 
