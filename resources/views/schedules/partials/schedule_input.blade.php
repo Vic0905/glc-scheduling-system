@@ -21,19 +21,20 @@
     <div class="bg-white dark:bg-gray-900 shadow-sm sm:rounded-lg p-6">
         <div class="bg-white dark:bg-gray-900 shadow-xl rounded-2xl overflow-x-auto overflow-y-auto max-w-full max-h-[700px] text-sm font-sans">
 
-            <table class="min-w-full border-separate border-spacing-0 text-sm">
+            <table class="min-w-full border-separate border-spacing-0 text-xs sm:text-xs md:text-base lg:text-xs text-gray-900 dark:text-white">
                 <thead class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 sticky top-0 z-10 shadow">
                     <tr>
-                        <th class="px-4 py-3 border border-gray-200 dark:border-gray-700 text-center text-sm">Teacher</th>
-                        <th class="px-4 py-3 border border-gray-200 dark:border-gray-700 text-center text-sm">Room</th>
+                        <th class="border border-gray-300 dark:border-gray-600 bg-slate-100 dark:bg-gray-800 px-3 py-2">Teacher</th>
+                        <th class="border border-gray-300 dark:border-gray-600 bg-slate-100 dark:bg-gray-800 px-3 py-2">Room</th>
                         @foreach(['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'] as $time)
                             @php
                                 $startTime = \Carbon\Carbon::createFromFormat('H:i', $time);
                                 $endTime = $startTime->copy()->addMinutes(50);
                             @endphp
-                            <th class="px-4 py-3 border border-gray-200 dark:border-gray-700 text-center whitespace-nowrap text-xs">
-                                {{ $startTime->format('H:i') }}<br>to<br>{{ $endTime->format('H:i') }}
+                            <th class="border border-gray-300 dark:border-gray-600 bg-slate-100 dark:bg-gray-800 px-3 py-2">
+                                {{ $startTime->format('H:i') }} – {{ $endTime->format('H:i') }}
                             </th>
+
                         @endforeach
                     </tr>
                 </thead>
