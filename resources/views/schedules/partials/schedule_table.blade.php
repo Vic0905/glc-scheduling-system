@@ -154,33 +154,3 @@
 @include('components.alerts.success')
 
 
-    {{-- <script>
-        function showTeacherStudents(teacherId, scheduleDate) {
-            fetch(`/teachers/${teacherId}/students/${scheduleDate}`)
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('teacherStudentsModalContainer').innerHTML = html;
-                    document.getElementById('teacherStudentsModal').classList.remove('hidden');
-                    attachStatusChangeListeners();
-                })
-                .catch(error => {
-                    console.error('Error loading students:', error);
-                    alert('Error loading students. Please check the console.');
-                });
-        }
-
-        function closeTeacherStudentsModal() {
-            document.getElementById('teacherStudentsModal').classList.add('hidden');
-        }
-
-        function attachStatusChangeListeners() {
-            document.querySelectorAll('.status-select').forEach(select => {
-                select.addEventListener('change', function () {
-                    let studentId = this.dataset.studentId;
-                    let newStatus = this.value;
-                    updateStudentStatus(studentId, newStatus);
-                });
-            });
-        }
-
-    </script>  --}}
