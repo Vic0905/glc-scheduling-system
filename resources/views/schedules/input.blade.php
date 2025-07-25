@@ -94,11 +94,6 @@
                             formData.set('teacher_id', teacherId);
                             formData.set('schedule_date', date.toISOString().slice(0, 10));
 
-                            const repeatCheckbox = document.querySelector('input[name="repeat_week"]');
-                            if (repeatCheckbox?.checked) {
-                                formData.set('repeat_week', '1');
-                            }
-
                             return fetch("{{ route('schedules.store') }}", {
                                 method: 'POST',
                                 headers: {
