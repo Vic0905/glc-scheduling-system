@@ -1,22 +1,35 @@
 <div class="py-2">
     <div class="max-w-10xl mx-auto sm:px-6 lg:px-8">
+        @php
+            use Carbon\Carbon;
+
+            // Always get current week's Monday and Friday
+            $start = Carbon::now()->startOfWeek(Carbon::MONDAY);
+            $end = $start->copy()->addDays(4); // Friday
+        @endphp
+
+        <div class="flex justify-center items-center px-4 bg-slate-100 dark:bg-gray-900">
+            <h2 class="text-3xl font-bold text-orange-700 dark:text-orange-400 mb-2">
+                {{ $start->format('F j') }} - {{ $end->format('F j, Y') }}
+            </h2>
+        </div>
+
         <div class="bg-white dark:bg-gray-900 sm:rounded-none p-0 shadow-none border border-gray-300 dark:border-gray-700">
             <div class="overflow-auto max-w-full max-h-[700px] text-sm font-sans border-t border-l border-gray-300 dark:border-gray-700">
                 <table class="min-w-full border-separate border-spacing-0 text-xs sm:text-xs md:text-base lg:text-xs text-gray-900 dark:text-white">
                     <thead class="sticky top-0 z-10 bg-gray-100 dark:bg-gray-700 border-b border-gray-300 dark:border-gray-600">
                         <tr>
-                            <th class="border border-gray-300 dark:border-gray-600 bg-slate-100 dark:bg-gray-800 px-3 py-2">Teacher</th>
-                            <th class="border border-gray-300 dark:border-gray-600 bg-slate-100 dark:bg-gray-800 px-3 py-2">Schedule Date</th>
+                            <th class="border border-blue-600 dark:border-gray-600 bg-blue-800 dark:bg-gray-800 px-3 py-2 text-white">Teacher</th>
+                            @role('teacher')<th class="border border-blue-600 dark:border-gray-600 bg-blue-800 dark:bg-gray-800 px-3 py-2 text-white">Sched-Date</th>@endrole
                             @php
                                 $timeSlots = [
                                     '08:00-08:50', '09:00-09:50', '10:00-10:50', '11:00-11:50', '12:00-12:50',
                                     '13:00-13:50', '14:00-14:50', '15:00-15:50', '16:00-16:50', '17:00-17:50',
                                     '18:00-18:50', '19:00-19:50', '20:00-20:50', '21:00-21:50',
-                                    
                                 ];
                             @endphp
                             @foreach($timeSlots as $slot)
-                                <th class="border border-gray-300 dark:border-gray-600 bg-slate-100 dark:bg-gray-800 px-3 py-2">
+                                <th class="border border-blue-600 dark:border-gray-600 bg-blue-800 dark:bg-gray-800 px-3 py-2 text-white">
                                     {{ str_replace('-', ' - ', $slot) }}
                                 </th>
                             @endforeach
@@ -24,14 +37,11 @@
                     </thead>
                     <tbody>
                         @php
-                            use Carbon\Carbon;
-
-                            $start = isset($startDate) ? Carbon::parse($startDate) : Carbon::now();
-                            $end = isset($endDate) ? Carbon::parse($endDate) : $start;
-
                             $dates = [];
                             for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
-                                $dates[] = $date->format('Y-m-d');
+                                if ($date->isWeekday()) {
+                                    $dates[] = $date->format('Y-m-d');
+                                }
                             }
 
                             $groupedByDate = $groupedSchedules->groupBy(fn($g) => $g->first()->schedule_date);
@@ -44,18 +54,13 @@
                                 $formattedDate = Carbon::parse($date)->format('l');
                             @endphp
 
-                            @if($groups->isEmpty())
-                                <tr class="text-center text-sm">
-                                    <td class="border px-4 py-2">No Schedule</td>
-                                    <td class="border px-4 py-2" colspan="11">{{ $date }} ({{ $formattedDate }})</td>
-                                </tr>
-                            @else
+                            @if($groups->isNotEmpty())
                                 @foreach($groups as $i => $group)
                                     <tr class="hover:bg-green-50 dark:hover:bg-gray-900 transition text-center text-xs align-middle">
                                         <td class="px-4 py-2 border-t border-r border-gray-300 dark:border-gray-700 w-40 max-w-[160px]">
                                             {{ $group->first()->teacher->name ?? 'N/A' }}
                                         </td>
-
+                                        @role('teacher')
                                         @if ($i === 0)
                                             <td class="px-4 py-2 border-t border-r border-gray-400 dark:border-gray-700 font-bold w-36 max-w-[140px] break-words align-middle bg-slate-50 dark:bg-gray-800 text-sm" rowspan="{{ $rowCount }}">
                                                 {{ Carbon::parse($date)->format('F j, Y') }}
@@ -63,7 +68,7 @@
                                                 <span class="text-red-500">({{ $formattedDate }})</span>
                                             </td>
                                         @endif
-
+                                        @endrole
                                         @foreach($timeSlots as $slot)
                                             @php
                                                 $scheduledStudents = $group->filter(fn($s) => $s->time_slot === $slot);
@@ -76,6 +81,9 @@
                                                             $isAbsent = in_array($status, ['N/A', 'absent GRP', 'absent MTM']);
                                                             $textColor = $isAbsent ? 'text-red-700 dark:text-red-300' : 'text-green-700 dark:text-green-300';
                                                             $bgColor = $isAbsent ? 'bg-red-0 dark:bg-gray-900' : 'bg-green-0 dark:bg-gray-900';
+
+                                                            // ✅ Ensure correct room is always used (even for subTeacher)
+                                                            $roomName = $schedule->room->roomname ?? 'No Room';
                                                         @endphp
                                                         <div class="{{ $bgColor }} mb-1 p-1 text-[10px] sm:text-xs rounded leading-tight">
                                                             <div class="flex flex-col space-y-1 text-[11px] sm:text-xs">
@@ -86,7 +94,7 @@
                                                                     {{ $schedule->subject->subjectname ?? 'N/A' }}
                                                                 </span>
                                                                 <strong class="whitespace-nowrap">
-                                                                    {{ $schedule->subTeacher->room->roomname ?? $schedule->teacher->room->roomname ?? 'No Room' }}
+                                                                    Room: {{ $roomName }}
                                                                 </strong>
                                                             </div>
                                                             <div>

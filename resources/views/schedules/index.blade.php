@@ -1,9 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-         <h2 class="font-bold text-2xl text-gray-800 dark:text-gray-100 leading-tight tracking-tight">
-            {{ __('Teacher') }}
-            {{-- <span class="text-sm text-gray-500">({{ $schedules->total() }} schedules)</span> --}}
-        </h2>
+         <div class="flex items-center w-full relative">
+            <h2 class="font-bold text-2xl text-gray-800 dark:text-gray-100 leading-tight tracking-tight">
+                {{ __('Teacher ') }} 
+            </h2>
+            <div class="absolute left-1/2 transform -translate-x-1/2">
+                <h2 class="font-bold text-2xl text-gray-800 dark:text-gray-100 leading-tight tracking-tight">
+                    {{ __('Schedule Table') }} 
+                </h2>
+            </div>
+        </div>
     </x-slot>
         
             

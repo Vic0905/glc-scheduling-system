@@ -35,17 +35,17 @@
         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between w-full">
             {{-- "Showing results" text --}}
             <div>
-                <p class="text-sm text-gray-700 leading-5 dark:text-gray-900 mr-2">
+                <p class="text-sm text-gray-700 leading-5 dark:text-gray-100 mr-2">
                     {!! __('Showing') !!}
                     @if ($paginator->firstItem())
-                        <span class="font-bold text-gray-900 dark:text-gray-900">{{ $paginator->firstItem() }}</span>
+                        <span class="font-bold text-gray-900 dark:text-gray-300">{{ $paginator->firstItem() }}</span>
                         {!! __('to') !!}
-                        <span class="font-bold text-gray-900 dark:text-gray-900">{{ $paginator->lastItem() }}</span>
+                        <span class="font-bold text-gray-900 dark:text-gray-300">{{ $paginator->lastItem() }}</span>
                     @else
-                        <span class="font-bold text-gray-900 dark:text-gray-900">{{ $paginator->count() }}</span>
+                        <span class="font-bold text-gray-900 dark:text-gray-100">{{ $paginator->count() }}</span>
                     @endif
                     {!! __('of') !!}
-                    <span class="font-bold text-gray-900 dark:text-gray-900">{{ $paginator->total() }}</span>
+                    <span class="font-bold text-gray-900 dark:text-gray-300">{{ $paginator->total() }}</span>
                     {!! __('results') !!}
                 </p>
             </div>

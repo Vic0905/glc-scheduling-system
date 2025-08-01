@@ -115,14 +115,14 @@
                     </x-nav-link>
 
                     {{-- SCHEDULES --}}
-                    <x-nav-link :href="route('schedules.index')" :active="request()->routeIs('schedules.index')"
+                    <x-nav-link :href="route('schedules.input')" :active="request()->routeIs('schedules.input')"
                         class="relative text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none focus:text-blue-600 dark:focus:text-blue-400 transition-colors duration-200">
                         <div class="flex flex-col items-center group">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round"
                                 class="lucide lucide-calendar-check 
-                                    {{ request()->routeIs('schedules.index') ? 'text-blue-700 dark:text-blue-400' : 'text-gray-500 dark:text-gray-300' }}
+                                    {{ request()->routeIs('schedules.input') ? 'text-blue-700 dark:text-blue-400' : 'text-gray-500 dark:text-gray-300' }}
                                     group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
                                 <path d="M8 2v4" />
                                 <path d="M16 2v4" />

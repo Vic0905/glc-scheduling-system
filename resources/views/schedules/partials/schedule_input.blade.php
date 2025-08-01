@@ -19,7 +19,7 @@
 <div class="max-w-10xl mx-auto sm:px-4 lg:px-6">
     <div class="overflow-x-auto"></div>
     <div class="bg-white dark:bg-gray-900 shadow-sm sm:rounded-lg p-6">
-        <div class="bg-white dark:bg-gray-900 shadow-xl rounded-2xl overflow-x-auto overflow-y-auto max-w-full max-h-[700px] text-sm font-sans">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-x-auto overflow-y-auto max-w-full max-h-[700px] text-sm font-sans">
 
             <table class="min-w-full border-separate border-spacing-0 text-xs sm:text-xs md:text-base lg:text-xs text-gray-900 dark:text-white">
                 <thead class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 sticky top-0 z-10 shadow">
@@ -66,7 +66,7 @@
                                     @endphp
                                     <td class="px-1 py-2 border border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-300 text-center">
                                         <div class="schedule-cell" data-room-id="{{ $room->id }}" data-time-slot="{{ $time }}">
-                                            <button type="button" class="show-form-btn text-blue-600 hover:underline text-xs">+ Create Record</button>
+                                            <button type="button" class="show-form-btn text-blue-600 hover:underline text-xs">Create Record</button>
                                             <div class="hidden mt-1">
                                                 <form class="schedule-form" data-room-id="{{ $room->id }}" data-time-slot="{{ $time }}">
                                                     @csrf
@@ -131,7 +131,7 @@
                                         <td class="px-1 py-2 border border-gray-200 dark:border-gray-700 align-middle text-gray-800 dark:text-gray-200">
                                             @if($scheduledStudents->isNotEmpty())
                                                 @foreach($scheduledStudents as $schedule)
-                                                    <div class="bg-white dark:bg-gray-900 border dark:border-gray-900 rounded-md p-1 mb-1">
+                                                    <div class="bg-green-200 dark:bg-indigo-900 border dark:border-gray-900 rounded-md p-1 mb-1">
                                                         <div class="text-xs font-medium">{{ $schedule->student->name ?? 'N/A' }}</div>
                                                         <div class="text-xs">{{ optional($schedule->subject)->subjectname ?? 'N/A' }}</div>
                                                         <div class="text-xs">
@@ -141,14 +141,14 @@
                                                                 <span class="text-gray-500 italic">No Substitute</span>
                                                             @endif
                                                         </div>
-                                                        <div class="flex space-x-2 mt-1">
-                                                            <button onclick="deleteSchedule({{ $schedule->id }})" class="text-red-500 text-xs ml-8 hover:underline">Delete</button>
+                                                        <div class="flex justify-center">
+                                                        <button onclick="deleteSchedule({{ $schedule->id }})" class="text-red-500 text-xs hover:underline">Delete</button>
                                                         </div>
                                                     </div>
                                                 @endforeach
                                             @else
                                                 <div class="schedule-cell" data-room-id="{{ $room->id }}" data-time-slot="{{ $time }}">
-                                                    <button type="button" class="show-form-btn text-blue-600 hover:underline text-xs text-center">+ Create Record</button>
+                                                    <button type="button" class="show-form-btn text-blue-600 hover:underline text-xs text-center">Create Record</button>
                                                     <div class="hidden mt-1">
                                                         <form class="schedule-form" data-room-id="{{ $room->id }}" data-time-slot="{{ $time }}">
                                                             @csrf
@@ -165,7 +165,6 @@
                                                                     <option value="{{ $teacher->user_id }}">{{ $teacher->user->name }}</option>
                                                                 @endforeach
                                                             </select>
-
                                                             <select name="student_id" class="block w-full text-xs py-1 px-2 mb-1 rounded-lg border border-gray-300
                                                              dark:border-gray-700 bg-white dark:bg-gray-900">
                                                                 <option value="">Select Student</option>
@@ -173,7 +172,6 @@
                                                                     <option value="{{ $student->id }}">{{ $student->name }}</option>
                                                                 @endforeach
                                                             </select>
-
                                                             <select name="subject_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300
                                                              dark:border-gray-700 bg-white dark:bg-gray-900">
                                                                 <option value="">Select Subject</option>
@@ -198,10 +196,9 @@
                     @endforeach
                 </tbody>
             </table>
-
-            <div class="mt-4">
-                {{ $rooms->withQueryString()->links() }}
-            </div>
+        </div>
+        <div>
+            {{ $rooms->withQueryString()->links() }}
         </div>
     </div>
 </div>

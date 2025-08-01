@@ -54,6 +54,7 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Name</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Nickname</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Room</th>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wide">Actions</th>
                             </tr>
                         </thead>
@@ -62,10 +63,11 @@
                                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition duration-150 ease-in-out">
                                     <td class="px-6 py-4 text-sm text-gray-800 dark:text-white">{{ $teacher->name }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-800 dark:text-white">{{ $teacher->nickname }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-800 dark:text-white"> {{ $teacher->room->roomname ?? 'No Room' }} </td>
                                     <td class="px-6 py-4 text-sm text-gray-800 dark:text-white">
                                         <div class="flex justify-start gap-2">
    
-                                            <button type="button" onclick="openEditModal({{ $teacher->id }}, '{{ $teacher->name }}', '{{ $teacher->nickname }}')"
+                                            <button type="button" onclick="openEditModal({{ $teacher->id }}, '{{ $teacher->name }}', '{{ $teacher->nickname }}', '{{ $teacher->room->roomname ?? '' }}')"
                                                 class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition flex items-center gap-1 text-sm font-medium">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
                                                     viewBox="0 0 24 24" stroke="currentColor">
@@ -128,15 +130,17 @@
                 }, 300);
         }
 
-        function openEditModal(teacherId, name, nickname) {
+        function openEditModal(teacherId, name, nickname, room) {
                 const modal = document.getElementById('editteacherModal');
                 const form = document.getElementById('editTeacherForm');
                 const input = document.getElementById('modalName');
                 const nicknameInput = document.getElementById('modalNickname');
+                const roomInput = document.getElementById('modalRoom');
 
                 form.action = `/teachers/${teacherId}`;
                 input.value = name;
                 nicknameInput.value = nickname;
+                roomInput.value = room;
 
                 modal.classList.remove('hidden');
 

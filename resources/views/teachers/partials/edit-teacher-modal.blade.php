@@ -38,6 +38,21 @@
                     required
                 >
             </div>
+             <!-- Room -->
+            <div>
+                <select
+                    name="room_id"
+                    id="modalRoom"
+                    class="w-full px-4 py-2 border dark:border-gray-700 dark:bg-gray-900 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                >
+                    <option value="">-- Select Room --</option>
+                    @foreach($rooms as $room)
+                        <option value="{{ $room->id }}" {{ $room->is_taken ? 'disabled' : '' }}>
+                            {{ $room->roomname }} {{ $room->is_taken ? '(Taken)' : '' }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
             <!-- Buttons -->
             <div class="flex justify-end gap-3 pt-4">

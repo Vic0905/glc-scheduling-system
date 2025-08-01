@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\Room;
 use App\Models\Schedule;
 use App\Models\Teacher;
 use App\Models\User;
@@ -11,29 +12,34 @@ use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
 class TeacherController extends Controller
-{
+{ 
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
-    {
-        // eager load the teacher and user relationship
-        $schedules = Schedule::with(['teacher', 'teacher.user'])->get();
-        // get all teachers from the database using the teacher model class
-        $teachers = Teacher::all();
-        // get the search term from the query string
-        $teacherName = $request->query('teacher_name');
+   public function index(Request $request)
+{
+    $teacherName = $request->query('teacher_name');
 
-        // Query the subjects table, using the correct column name 'teachername'
-        $teachers = Teacher::query()
-            ->when($teacherName, function ($query) use ($teacherName) {
-                $query->where('name', 'like', '%'.$teacherName.'%');
-            })
-            ->orderBy('name', 'asc') // Sort alphabetically
-            ->paginate(20); // Display 15 teachers per page
+    $teachers = Teacher::query()
+        ->when($teacherName, function ($query) use ($teacherName) {
+            $query->where('name', 'like', '%'.$teacherName.'%');
+        })
+        ->orderBy('name', 'asc')
+        ->paginate(20);
 
-        return view('teachers.index', compact('teachers', 'teacherName'));
-    }
+    $assignedRoomIds = Teacher::whereNotNull('room_id')->pluck('room_id')->toArray();
+
+    $rooms = Room::all();
+
+    // Mark rooms with a flag if already assigned
+    $rooms->map(function ($room) use ($assignedRoomIds) {
+        $room->is_taken = in_array($room->id, $assignedRoomIds);
+        return $room;
+    });
+
+    return view('teachers.index', compact('teachers', 'teacherName', 'rooms'));
+}
+
 
     /**
      * Show the form for creating a new teacher.

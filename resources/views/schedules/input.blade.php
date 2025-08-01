@@ -1,9 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-gray-800 dark:text-gray-100 leading-tight tracking-tight">
-            {{ __('Input Schedule') }}
-        
-        </h2>
+       <div class="flex items-center w-full relative">
+            <h2 class="font-bold text-2xl text-gray-800 dark:text-gray-100 leading-tight tracking-tight">
+                {{ __('Input ') }} 
+            </h2>
+            <div class="absolute left-1/2 transform -translate-x-1/2">
+                <h2 class="font-bold text-2xl text-gray-800 dark:text-gray-100 leading-tight tracking-tight">
+                    {{ __('Advance Schedule') }} 
+                </h2>
+            </div>
+        </div>
     </x-slot>
 
         <div class="flex flex-col md:flex-row md:justify-between md:items-end items-stretch p-4 gap-3 w-full max-w-6xl mx-auto">

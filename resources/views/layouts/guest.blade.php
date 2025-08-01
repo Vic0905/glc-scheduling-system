@@ -24,7 +24,7 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased text-white">
+<body class="font-sans antialiased text-white"> 
 
     <div class="min-h-screen flex items-center justify-center relative">
 
@@ -35,7 +35,7 @@
         <div class="relative z-10 w-full max-w-md mx-auto p-6 bg-white bg-opacity-20 backdrop-blur-md shadow-2xl rounded-2xl">
             <div class="flex justify-center mb-6">
                 <a href="/">
-                    <x-application-logo class="w-16 h-16 text-white" />
+                    <x-application-logo class="w-30 h-30 text-white" />
                 </a>
             </div>
 

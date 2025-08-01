@@ -64,7 +64,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-900">
                         @forelse($students as $student)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-900 transition duration-150 ease-in-out">
+                            <tr class="transition duration-150 ease-in-out">
                                 <td class="px-6 py-4 text-sm text-gray-800 dark:text-gray-100">{{ $student->name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800 dark:text-gray-100">{{ $student->english_name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-800 dark:text-gray-100">{{ $student->course }}</td>

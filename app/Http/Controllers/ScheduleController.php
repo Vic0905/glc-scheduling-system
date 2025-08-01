@@ -24,8 +24,9 @@ class ScheduleController extends Controller
         $studentName = $request->query('student_name', '');
         $date = $request->input('schedule_date', '');
 
-        $startDate = $request->input('start_date') ?? now()->toDateString();
-        $endDate = $request->input('end_date') ?? now()->toDateString();
+        // Always get Monday to Friday of the current week
+        $startDate = Carbon::now()->startOfWeek(Carbon::MONDAY);
+        $endDate = $startDate->copy()->addDays(4); // Friday
 
         $query = Schedule::with([
             'student',
@@ -41,9 +42,8 @@ class ScheduleController extends Controller
             $query->whereDate('schedule_date', $date);
         }
 
-        if ($startDate && $endDate) {
-            $query->whereBetween('schedule_date', [$startDate, $endDate]);
-        }
+        // Only fetch schedules between Monday to Friday
+        $query->whereBetween('schedule_date', [$startDate->toDateString(), $endDate->toDateString()]);
 
         if ($teacherName) {
             $query->whereHas('teacher.user', function ($q) use ($teacherName) {
@@ -59,20 +59,19 @@ class ScheduleController extends Controller
 
         $schedules = $query->get();
 
-        // Duplicate sub teacher schedule
+        // Handle sub teacher schedules
         $subSchedules = $schedules->filter(fn ($s) => $s->sub_teacher_id)->map(function ($s) {
             $clone = clone $s;
             $clone->teacher_id = $s->sub_teacher_id;
             $clone->teacher = $s->subTeacher;
             $clone->room = $s->subTeacher->room ?? $s->room;
-
             return $clone;
         });
+        
 
         $mergedSchedules = $schedules->merge($subSchedules);
 
-        // ✅ Only show schedules where teacher is current user and weekday only (Mon-Fri)
-        /** @var \App\Models\User $user */
+        // Filter by teacher role, and restrict to weekdays
         if ($user->hasRole('teacher')) {
             $mergedSchedules = $mergedSchedules->filter(function ($schedule) use ($user) {
                 if (! $schedule->schedule_date || ! $schedule->teacher) {
@@ -80,35 +79,31 @@ class ScheduleController extends Controller
                 }
 
                 $isOwner = $schedule->teacher->user_id === $user->id;
-                $dayOfWeek = \Carbon\Carbon::parse($schedule->schedule_date)->dayOfWeek;
+                $dayOfWeek = Carbon::parse($schedule->schedule_date)->dayOfWeek;
 
-                return $isOwner && $dayOfWeek >= 1 && $dayOfWeek <= 5; // Monday to Friday
+                return $isOwner && $dayOfWeek >= 1 && $dayOfWeek <= 5;
             });
         }
 
-        // Get all rooms sorted by room name
-        $rooms = Room::orderBy('roomname', 'asc')->get(); // ✅ Define $rooms
+        $rooms = Room::orderBy('roomname', 'asc')->get();
 
-        // Sort mergedSchedules by room name
         $mergedSchedules = $mergedSchedules->sortBy(function ($schedule) {
             return $schedule->room->roomname ?? '';
         });
 
-        // Group by teacher name + date
         $groupedSchedules = $mergedSchedules->groupBy(function ($schedule) {
             return $schedule->teacher->name.'-'.$schedule->schedule_date;
         });
 
         return view('schedules.index', compact(
             'groupedSchedules',
-            'rooms', 
-            'teacherName', 
-            'studentName', 
-            'date', 
-            'startDate', 
+            'rooms',
+            'teacherName',
+            'studentName',
+            'date',
+            'startDate',
             'endDate'
         ));
-
     }
 
     public function create()
@@ -130,12 +125,26 @@ class ScheduleController extends Controller
             'teacher_id' => 'required|exists:users,id',
             'sub_teacher_id' => 'nullable|exists:users,id',
             'subject_id' => 'required|exists:subjects,id',
-            'room_id' => 'required|exists:rooms,id',
-            'time_slot' => ['required', 'string'], // ✅ Use this instead of schedule_time
+            'time_slot' => ['required', 'string'],
             'repeat_week' => 'nullable',
+            'room_id' => 'nullable|exists:rooms,id', // Allow room_id from request if needed
         ]);
 
+        // ✅ Attempt to get teacher room_id
+        $teacher = Teacher::where('user_id', $validatedData['teacher_id'])->first();
+
+        // ✅ Use teacher's room_id or fallback to room_id from request
+        $roomId = $teacher->room_id ?? $validatedData['room_id'] ?? null;
+
+        if (! $roomId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No room found for the selected teacher or request.',
+            ], 422);
+        }
+
         $baseData = array_merge($validatedData, [
+            'room_id' => $roomId,
             'status' => 'N/A',
             'schedule_state' => 'active',
         ]);
@@ -159,7 +168,7 @@ class ScheduleController extends Controller
 
         foreach ($datesToSchedule as $date) {
             $conflict = Schedule::where('schedule_date', $date->toDateString())
-                ->where('time_slot', $validatedData['time_slot']) // ✅ Match with your DB
+                ->where('time_slot', $validatedData['time_slot'])
                 ->where(function ($query) use ($request) {
                     $query->where('teacher_id', $request->teacher_id)
                         ->orWhere('student_id', $request->student_id);
@@ -182,8 +191,7 @@ class ScheduleController extends Controller
         ]);
     }
 
-
-    public function destroy(Schedule $schedule)
+    public function destroy(Schedule $schedule) 
     {
         try {
             $schedule->delete();
@@ -346,60 +354,68 @@ class ScheduleController extends Controller
     }
 
     public function input(Request $request)
-    {
+    { 
         $user = Auth::user();
 
-        $students = Student::all();
-        $teachers = Teacher::all(); // For both teacher and substitute dropdowns
-        $subjects = Subject::all();
+        // Static dropdowns
+        $students = Student::select('id', 'name')->get();
+        $teachers = Teacher::with('user:id,name')->get();
+        $subjects = Subject::select('id', 'subjectname')->get();
 
         $teacherName = $request->query('teacher_name', '');
         $studentName = $request->query('student_name', '');
         $startDate = $request->query('start_date', now()->format('Y-m-d'));
         $endDate = $request->query('end_date', now()->format('Y-m-d'));
 
-        // ✅ Include subTeacher eager loading
-        $query = Schedule::with(['student',
-            'teacher.user',
-            'subTeacher.user',
-            'subTeacher.room',
-            'subject',
-            'room'])
+        // Initial schedule filter for determining matching teacher/room IDs
+        $filteredSchedulesQuery = Schedule::query()
+            ->with('teacher.user')
             ->where('schedule_state', '!=', 'cleared')
-            ->whereBetween('schedule_date', [$startDate, $endDate])
-            ->orderBy('created_at', 'desc');
+            ->whereBetween('schedule_date', [$startDate, $endDate]);
 
         if ($teacherName) {
-            $query->whereHas('teacher.user', function ($q) use ($teacherName) {
-                $q->where('name', 'like', '%'.$teacherName.'%');
-            });
+            $filteredSchedulesQuery->whereHas('teacher.user', fn ($q) =>
+                $q->where('name', 'like', "%$teacherName%")
+            );
         }
 
         if ($studentName) {
-            $query->whereHas('student', function ($q) use ($studentName) {
-                $q->where('name', 'like', '%'.$studentName.'%');
-            });
+            $filteredSchedulesQuery->whereHas('student', fn ($q) =>
+                $q->where('name', 'like', "%$studentName%")
+            );
         }
 
-        $schedules = $query->get();
+        $filteredSchedules = $filteredSchedulesQuery->get();
 
-        $teacherIdsInFilteredSchedules = $schedules->pluck('teacher_id')->unique()->filter()->values()->all();
+        // Get matching room IDs
+        $roomIdsInFilteredSchedules = $filteredSchedules->pluck('room_id')->unique()->filter()->values();
 
-        $roomQuery = Room::orderBy('roomname');
+        // Get paginated rooms
+        $rooms = Room::orderBy('roomname')
+            ->when($teacherName, function ($query) use ($roomIdsInFilteredSchedules) {
+                return $roomIdsInFilteredSchedules->isNotEmpty()
+                    ? $query->whereIn('id', $roomIdsInFilteredSchedules)
+                    : $query->whereRaw('1 = 0'); // Return none if no match
+            })
+            ->paginate(30);
 
-        if ($teacherName && ! empty($teacherIdsInFilteredSchedules)) {
-            $roomIdsInFilteredSchedules = $schedules->pluck('room_id')->unique()->filter()->values()->all();
-            $roomQuery->whereIn('id', $roomIdsInFilteredSchedules);
-        } elseif ($teacherName && empty($teacherIdsInFilteredSchedules)) {
-            $roomQuery->whereRaw('1 = 0'); // No rooms shown if no match
-        }
+        $currentRoomIds = $rooms->pluck('id');
 
-        $rooms = $roomQuery->paginate(50);
+        // Reload actual schedules for current paginated rooms
+        $schedules = Schedule::with([
+                'student:id,name',
+                'teacher.user:id,name',
+                'subTeacher.user:id,name',
+                'subTeacher.room:id,roomname',
+                'subject:id,subjectname',
+                'room:id,roomname'
+            ])
+            ->where('schedule_state', '!=', 'cleared')
+            ->whereBetween('schedule_date', [$startDate, $endDate])
+            ->whereIn('room_id', $currentRoomIds)
+            ->get();
 
-        // Group by room for Blade view
-        $schedulesByRoom = $schedules->groupBy(function ($schedule) {
-            return $schedule->room->roomname ?? 'Unknown Room';
-        });
+        $schedulesByRoom = $schedules->groupBy(fn ($s) => $s->room->roomname ?? 'Unknown Room');
 
         return view('schedules.input', compact(
             'schedulesByRoom',
@@ -414,7 +430,7 @@ class ScheduleController extends Controller
             'endDate'
         ));
     }
- 
+
     public function destroyByRoomAndDate($roomId, $scheduleDate)
     {
         // Find schedules matching the room and date
