@@ -68,7 +68,7 @@
     @include('components.alerts.success')
 
     <script>
-        function initializeScheduleFormEvents() {
+    function initializeScheduleFormEvents() {
         document.querySelectorAll('.schedule-form select').forEach(select => {
             if (!select.dataset.bound) {
                 select.dataset.bound = true;
@@ -148,112 +148,52 @@
         });
     });
 
-    function clearSchedule(scheduleId, event) {
-        event.preventDefault();
 
-        if (!confirm("Clear this schedule to make room for a new one?")) return;
-
-        fetch(`/schedules/${scheduleId}/clear`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Schedule successfully cleared!');
-
-                const button = event.target;
-                const cell = button.closest('td');
-
-                // Replace the <td> content with the form layout
-                cell.innerHTML = `
-                    <form class="schedule-form" data-room-id="${data.room_id}" data-time-slot="${data.time_slot}" data-slot-key="${data.slot_key}">
-                        <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
-                        <input type="hidden" name="room_id" value="${data.room_id}">
-                        <input type="hidden" name="schedule_time" value="${data.time_slot}">
-                        <input type="hidden" name="${data.slot_key}" value="1">
-                        <input type="hidden" name="start_date" value="${data.start_date}">
-                        <input type="hidden" name="end_date" value="${data.end_date}">
-                        <input type="hidden" name="teacher_id" value="">
-
-                        <select name="student_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-1" required>
-                            <option value="" selected>Select Student</option>
-                            ${data.students.map(student => `<option value="${student.id}">${student.name}</option>`).join('')}
-                        </select>
-
-                        <select name="subject_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-1" required>
-                            <option value="" selected>Select Subject</option>
-                            ${data.subjects.map(subject => `<option value="${subject.id}">${subject.subjectname}</option>`).join('')}
-                        </select>
-
-                        <select name="sub_teacher_id" class="block w-full text-xs py-1 px-2 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-1">
-                            <option value="">Substitute Teacher</option>
-                            ${data.teachers.map(teacher => `<option value="${teacher.user_id}">${teacher.user.name}</option>`).join('')}
-                        </select>
-                    </form>
-                `;
-
-                initializeScheduleFormEvents();
-            } else {
-                alert('Failed to clear schedule.');
-            }
-        })
-        .catch(error => {
-            console.error('Clear failed:', error);
-            alert('An error occurred while clearing the schedule.');
-        });
+    function deleteSchedule(scheduleId) {
+        if (confirm('Are you sure you want to delete this schedule?')) {
+            fetch(`/schedules/${scheduleId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error deleting schedule');
+                }
+            });
+        }
     }
 
-
-        function deleteSchedule(scheduleId) {
-            if (confirm('Are you sure you want to delete this schedule?')) {
-                fetch(`/schedules/${scheduleId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json',
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert(data.message || 'Error deleting schedule');
-                    }
-                });
-            }
+    function confirmDeleteByRoomAndDate(roomId, scheduleDate) {
+        if (confirm('Are you sure you want to delete all schedules for this room on this date?')) {
+            fetch(`/schedules/delete-by-room-date`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ room_id: roomId, schedule_date: scheduleDate })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error deleting schedules by room and date');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during bulk deletion.');
+            });
         }
-
-        function confirmDeleteByRoomAndDate(roomId, scheduleDate) {
-            if (confirm('Are you sure you want to delete all schedules for this room on this date?')) {
-                fetch(`/schedules/delete-by-room-date`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify({ room_id: roomId, schedule_date: scheduleDate })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert(data.message || 'Error deleting schedules by room and date');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred during bulk deletion.');
-                });
-            }
-        }
+    }
     </script>
 </x-app-layout> 
  

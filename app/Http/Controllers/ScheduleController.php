@@ -24,9 +24,17 @@ class ScheduleController extends Controller
         $studentName = $request->query('student_name', '');
         $date = $request->input('schedule_date', '');
 
-        // Always get Monday to Friday of the current week
-        $startDate = Carbon::now()->startOfWeek(Carbon::MONDAY);
-        $endDate = $startDate->copy()->addDays(4); // Friday
+        // Default to today if no specific date is provided
+        $today = Carbon::today();
+
+        // These are used for heading display
+        if ($date) {
+            $start = Carbon::parse($date)->startOfWeek(Carbon::MONDAY);
+        } else {
+            $start = Carbon::now()->startOfWeek(Carbon::MONDAY);
+        }
+        $end = $start->copy()->addDays(4);
+
 
         $query = Schedule::with([
             'student',
@@ -38,22 +46,28 @@ class ScheduleController extends Controller
             'room',
         ])->where('schedule_state', '!=', 'cleared');
 
+        // Apply filters
         if ($date) {
             $query->whereDate('schedule_date', $date);
+        } elseif (!$teacherName && !$studentName) {
+            // Default to today if no filters are set
+            $query->whereDate('schedule_date', $today->toDateString());
+        } else {
+            // If filters are used but no date is given, default to Mon–Fri this week
+            $monday = Carbon::now()->startOfWeek(Carbon::MONDAY);
+            $friday = $monday->copy()->addDays(4);
+            $query->whereBetween('schedule_date', [$monday->toDateString(), $friday->toDateString()]);
         }
-
-        // Only fetch schedules between Monday to Friday
-        $query->whereBetween('schedule_date', [$startDate->toDateString(), $endDate->toDateString()]);
 
         if ($teacherName) {
             $query->whereHas('teacher.user', function ($q) use ($teacherName) {
-                $q->where('name', 'like', '%'.$teacherName.'%');
+                $q->where('name', 'like', '%' . $teacherName . '%');
             });
         }
 
         if ($studentName) {
             $query->whereHas('student', function ($q) use ($studentName) {
-                $q->where('name', 'like', '%'.$studentName.'%');
+                $q->where('name', 'like', '%' . $studentName . '%');
             });
         }
 
@@ -67,14 +81,14 @@ class ScheduleController extends Controller
             $clone->room = $s->subTeacher->room ?? $s->room;
             return $clone;
         });
-        
 
         $mergedSchedules = $schedules->merge($subSchedules);
 
         // Filter by teacher role, and restrict to weekdays
+        /** @var \App\Models\User $user */
         if ($user->hasRole('teacher')) {
             $mergedSchedules = $mergedSchedules->filter(function ($schedule) use ($user) {
-                if (! $schedule->schedule_date || ! $schedule->teacher) {
+                if (!$schedule->schedule_date || !$schedule->teacher) {
                     return false;
                 }
 
@@ -92,7 +106,7 @@ class ScheduleController extends Controller
         });
 
         $groupedSchedules = $mergedSchedules->groupBy(function ($schedule) {
-            return $schedule->teacher->name.'-'.$schedule->schedule_date;
+            return $schedule->teacher->name . '-' . $schedule->schedule_date;
         });
 
         return view('schedules.index', compact(
@@ -101,20 +115,9 @@ class ScheduleController extends Controller
             'teacherName',
             'studentName',
             'date',
-            'startDate',
-            'endDate'
+            'start',
+            'end'
         ));
-    }
-
-    public function create()
-    {
-        // list of datas and display it in the admin page for the admin to create the schedule
-        $students = Student::all();
-        $teachers = Teacher::all();
-        $subjects = Subject::all();
-        $rooms = Room::all();
-
-        return view('schedules.create', compact('students', 'teachers', 'subjects', 'rooms'));
     }
 
     public function store(Request $request)
@@ -122,7 +125,7 @@ class ScheduleController extends Controller
         $validatedData = $request->validate([
             'schedule_date' => 'required|date',
             'student_id' => 'required|exists:students,id',
-            'teacher_id' => 'required|exists:users,id',
+            'teacher_id' => 'nullable|exists:users,id',
             'sub_teacher_id' => 'nullable|exists:users,id',
             'subject_id' => 'required|exists:subjects,id',
             'time_slot' => ['required', 'string'],

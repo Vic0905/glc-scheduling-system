@@ -131,7 +131,7 @@
                                         <td class="px-1 py-2 border border-gray-200 dark:border-gray-700 align-middle text-gray-800 dark:text-gray-200">
                                             @if($scheduledStudents->isNotEmpty())
                                                 @foreach($scheduledStudents as $schedule)
-                                                    <div class="bg-green-200 dark:bg-indigo-900 border dark:border-gray-900 rounded-md p-1 mb-1">
+                                                    <div class="bg-green-200 dark:bg-gray-900 border dark:border-gray-900 rounded-md p-1 mb-1">
                                                         <div class="text-xs font-medium">{{ $schedule->student->name ?? 'N/A' }}</div>
                                                         <div class="text-xs">{{ optional($schedule->subject)->subjectname ?? 'N/A' }}</div>
                                                         <div class="text-xs">
